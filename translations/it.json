@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "name": "Italiano"
+  },
+  "screen": {},
+  "app": {
+    "name": "Tasto con icona",
+    "summary": "Un riquadro con solo un'icona: toccalo per eseguire uno script, una scena o un pulsante di Home Assistant.",
+    "tile_name": "Tasto con icona",
+    "tile_example": "Un tasto più o meno",
+    "icon": "Icona",
+    "icon_hint": "L'icona mostrata dal riquadro.",
+    "show_name": "Mostra il nome",
+    "show_name_hint": "Scrive il nome del riquadro sotto l'icona."
+  }
+}

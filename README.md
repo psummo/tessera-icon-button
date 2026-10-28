@@ -1,0 +1,15 @@
+# Icon button
+
+A tile that is only an icon. Tap it and it runs a script, a scene or a button of Home Assistant: a plus and a minus for
+a thermostat, a play button, a lock.
+
+## Set up
+
+1. Add the plugin to a screen in Tessera. The screen builds once.
+2. In Layout, place the **Icon button** tile from the library's Plugins group.
+3. In the inspector, choose the script, scene or button it runs, then the icon. Optionally write the name under it.
+
+## Good to know
+
+- Works with `script.*`, `scene.*`, `button.*` and `input_button.*`.
+- The editor preview shows the tile's name; the icon is drawn on the screen itself.

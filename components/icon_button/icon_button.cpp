@@ -1,0 +1,108 @@
+#include "icon_button.h"
+#include <cstring>
+#include <string>
+
+namespace esphome::icon_button {
+
+using tessera::Font;
+namespace ui = tessera::ui;
+
+// The icons the editor offers (the choice values of the manifest) and their codepoints in Tessera's icon set.
+struct IconEntry {
+  const char *name;
+  uint32_t code;
+};
+static const IconEntry ICONS[] = {
+    {"plus", 0xF0415},
+    {"minus", 0xF0374},
+    {"chevron_up", 0xF0143},
+    {"chevron_down", 0xF0140},
+    {"arrow_up", 0xF005D},
+    {"arrow_down", 0xF0045},
+    {"fire", 0xF0238},
+    {"power", 0xF0425},
+    {"play", 0xF040A},
+    {"pause", 0xF03E4},
+    {"stop", 0xF04DB},
+    {"check", 0xF012C},
+    {"close", 0xF0156},
+    {"lock", 0xF033E},
+    {"lock_open", 0xF033F},
+    {"bell", 0xF009A},
+    {"home", 0xF02DC},
+    {"volume_plus", 0xF075D},
+    {"volume_minus", 0xF075E},
+    {"skip_next", 0xF04AD},
+    {"skip_previous", 0xF04AE},
+    {"thermometer", 0xF050F},
+    {"thermostat", 0xF0393},
+    {"radiator", 0xF0438},
+    {"snowflake", 0xF0717},
+    {"fan", 0xF0210},
+    {"lightbulb", 0xF0335},
+    {"flash", 0xF0241},
+    {"script", 0xF0BC2},
+    {"tap", 0xF12A8},
+};
+
+static uint32_t icon_code(const char *name) {
+  for (const IconEntry &e : ICONS)
+    if (strcmp(e.name, name) == 0) return e.code;
+  return ICONS[0].code;
+}
+
+// The Home Assistant action a tap sends, chosen from the domain of the entity.
+static const char *service_for(const std::string &entity) {
+  if (entity.rfind("script.", 0) == 0) return "script.turn_on";
+  if (entity.rfind("scene.", 0) == 0) return "scene.turn_on";
+  if (entity.rfind("input_button.", 0) == 0) return "input_button.press";
+  if (entity.rfind("button.", 0) == 0) return "button.press";
+  return nullptr;
+}
+
+class ButtonTile : public tessera::Tile {
+ public:
+  void create(const tessera::TileContext &c) override {
+    entity_ = c.entity ? c.entity : "";
+    show_name_ = c.options["show_name"] | false;
+    const std::string name = c.name ? c.name : "";
+    const int width = c.width, height = c.height;
+
+    icon_ = ui::label(c.parent, Font::ICON, entity_.empty() ? theme::MUTED : theme::INK);
+    ui::set_text(icon_, ui::icon(icon_code(c.options["icon"] | "plus")));
+    lv_obj_set_width(icon_, width);
+    lv_obj_set_style_text_align(icon_, LV_TEXT_ALIGN_CENTER, 0);
+    const int ih = ui::line_height(Font::ICON);
+
+    int nh = 0;
+    if (show_name_ && !name.empty()) {
+      name_ = ui::label(c.parent, Font::BODY, theme::MUTED);
+      ui::set_text(name_, name);
+      lv_obj_set_width(name_, width);
+      lv_obj_set_style_text_align(name_, LV_TEXT_ALIGN_CENTER, 0);
+      nh = ui::line_height(Font::BODY);
+    }
+    const int top = (height - ih - nh) / 2;
+    lv_obj_set_pos(icon_, 0, top);
+    if (name_) lv_obj_set_pos(name_, 0, top + ih);
+  }
+
+  void on_tap() override {
+    const char *service = service_for(entity_);
+    if (service) tessera::action(service, entity_);
+  }
+
+  void on_theme() override {
+    ui::set_color(icon_, entity_.empty() ? theme::MUTED : theme::INK);
+    if (name_) ui::set_color(name_, theme::MUTED);
+  }
+
+ private:
+  std::string entity_;
+  bool show_name_ = false;
+  lv_obj_t *icon_{}, *name_{};
+};
+
+void IconButton::setup() { add_tile("button", [this]() { return new ButtonTile(); }); }
+
+}  // namespace esphome::icon_button

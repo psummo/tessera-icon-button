@@ -1,0 +1,14 @@
+tiles:
+  - tile: button
+    name: Plus
+    options: { icon: plus }
+    sizes: [1x1, 2x2]
+    entity: script.temperature_up
+  - tile: button
+    name: Meno
+    options: { icon: minus, show_name: true }
+    sizes: [1x1]
+    entity: script.temperature_down
+states:
+  script.temperature_up: { state: "off" }
+  script.temperature_down: { state: "off" }
