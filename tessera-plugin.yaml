@@ -1,5 +1,5 @@
 id: icon_button
-version: 0.7.0
+version: 0.8.0
 api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
@@ -12,7 +12,7 @@ boards: any
 flash_kb: 12
 
 permissions:
-  home_assistant_actions: [script.turn_on, light.toggle, switch.toggle, input_boolean.toggle, fan.toggle]
+  home_assistant_actions: [script.turn_on, light.toggle, switch.toggle, input_boolean.toggle, fan.toggle, light.turn_on, light.turn_off, cover.set_cover_position, fan.set_percentage, fan.turn_off]
 
 tiles:
   # A tile that is only an icon: tapping it runs a script of Home Assistant.
@@ -80,4 +80,21 @@ tiles:
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
       - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
           choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }, { value: large, label: size_large }, { value: xlarge, label: size_xlarge }] }
+      - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }
+  # A slider for a dimmable light, a cover (blind, shutter) or a fan: tap where the bar should reach.
+  - id: slider
+    name: tile_name_slider
+    icon: gauge
+    sizes: { min: 2x1, max: 4x4 }
+    memory: 600
+    domains: [light, cover, fan]
+    attributes: [brightness, current_position, percentage]
+    example: tile_example_slider
+    preview: { title: "{name}" }
+    options:
+      - { id: icon_name, kind: text, label: icon_name, hint: icon_name_hint, default: "" }
+      - { id: color, kind: choice, label: color, hint: color_hint, default: accent,
+          choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
+      - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,
+          choices: [{ value: auto, label: orient_auto }, { value: horizontal, label: orient_horizontal }, { value: vertical, label: orient_vertical }] }
       - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }

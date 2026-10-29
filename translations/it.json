@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Tasto con icona",
-    "summary": "Riquadri con solo icona: uno esegue uno script, uno accende/spegne una luce, uno un interruttore, input_boolean o ventilatore; gli ultimi due mostrano se è acceso.",
+    "summary": "Tasti con solo icona per script, luci, interruttori e ventilatori, e uno slider a tocco per luci dimmerabili, tapparelle e ventilatori.",
     "tile_name": "Tasto con icona",
     "tile_example": "Un tasto più o meno",
     "icon": "Icona",
@@ -60,6 +60,13 @@
     "icon_name": "Icona per nome",
     "icon_name_hint": "Facoltativo: il nome di una qualsiasi icona di Tessera, come ceiling-light o washing-machine. Sostituisce l'icona scelta sopra. Vedi ICONS.md nel repository del plugin.",
     "size_large": "Grande",
-    "size_xlarge": "Molto grande"
+    "size_xlarge": "Molto grande",
+    "tile_name_slider": "Slider",
+    "tile_example_slider": "Uno slider per luce dimmerabile o tapparella",
+    "orientation": "Direzione",
+    "orientation_hint": "Auto segue la forma del riquadro: un riquadro più alto è verticale.",
+    "orient_auto": "Auto",
+    "orient_horizontal": "Orizzontale",
+    "orient_vertical": "Verticale"
   }
 }

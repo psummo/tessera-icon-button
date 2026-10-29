@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Icon button",
-    "summary": "Icon-only tiles: one runs a script, one toggles a light, one toggles a switch, input_boolean or fan; both follow whether it is on.",
+    "summary": "Icon-only buttons for scripts, lights, switches and fans, and a tap slider for dimmers, blinds and fans.",
     "tile_name": "Icon button",
     "tile_example": "A plus or minus button",
     "icon": "Icon",
@@ -90,6 +90,13 @@
     "icon_name": "Icon by name",
     "icon_name_hint": "Optional: any icon name of Tessera's set, such as ceiling-light or washing-machine. It replaces the icon above. See ICONS.md in the plugin's repository.",
     "size_large": "Large",
-    "size_xlarge": "Extra large"
+    "size_xlarge": "Extra large",
+    "tile_name_slider": "Slider",
+    "tile_example_slider": "A dimmer or blind slider",
+    "orientation": "Direction",
+    "orientation_hint": "Auto follows the shape of the tile: a taller tile is vertical.",
+    "orient_auto": "Auto",
+    "orient_horizontal": "Horizontal",
+    "orient_vertical": "Vertical"
   }
 }

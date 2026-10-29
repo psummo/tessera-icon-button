@@ -14,7 +14,12 @@ tiles:
     options: { icon: lightbulb, border: busy }
     sizes: [1x1, 2x2]
     entity: light.salotto
+  - tile: slider
+    name: Tapparella
+    sizes: [2x1, 2x2]
+    entity: cover.studio
 states:
+  cover.studio: { state: open, attributes: { current_position: 60 } }
   light.salotto: { state: "on" }
   script.temperature_up: { state: "off" }
   script.temperature_down: { state: "off" }

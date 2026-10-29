@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.0
+- New tile: a slider for dimmable lights, covers and fans. Tap where the bar should reach.
+
 ## 0.7.0
 - Icon size: large and extra large (the icon drawn scaled).
 - Icon by name: any of the 349 icons of Tessera's set; the list has 48 of them (ICONS.md has all names).

@@ -1,4 +1,5 @@
 #include "icon_button.h"
+#include <algorithm>
 #include <cstring>
 #include <string>
 
@@ -522,10 +523,149 @@ class ButtonTile : public tessera::Tile {
   lv_obj_t *icon_{}, *name_{}, *outer_{};
 };
 
+// A slider for a dimmable light, a cover or a fan. The core takes the drags, so a tap sets the level: tap where the bar
+// should reach. The tile follows the entity: a bar filled to its brightness, position or speed, and the number.
+class SliderTile : public tessera::Tile {
+ public:
+  void create(const tessera::TileContext &c) override {
+    entity_ = c.entity ? c.entity : "";
+    w_ = c.width;
+    h_ = c.height;
+    const char *dir = c.options["orientation"] | "auto";
+    vertical_ = strcmp(dir, "vertical") == 0 || (strcmp(dir, "auto") == 0 && h_ > w_);
+    paint_ = paint_for(c.options["color"] | "accent");
+    kind_ = entity_.rfind("cover.", 0) == 0 ? COVER : entity_.rfind("fan.", 0) == 0 ? FAN : LIGHT;
+    const char *fallback = kind_ == COVER ? "window-shutter" : kind_ == FAN ? "fan" : "lightbulb";
+    const std::string name = c.name ? c.name : "";
+    const bool show_name = (c.options["show_name"] | false) && !name.empty();
+
+    const int pad = ui::px(6);
+    const int thick = std::min((vertical_ ? w_ : h_) / 3, ui::px(40));
+    if (vertical_) {
+      bar_x_ = w_ - pad - thick;
+      bar_y_ = pad;
+      bar_w_ = thick;
+      bar_h_ = h_ - 2 * pad;
+    } else {
+      bar_x_ = pad;
+      bar_y_ = h_ - pad - thick;
+      bar_w_ = w_ - 2 * pad;
+      bar_h_ = thick;
+    }
+    track_ = ui::block(c.parent, theme::TRACK);
+    lv_obj_set_size(track_, bar_w_, bar_h_);
+    lv_obj_set_pos(track_, bar_x_, bar_y_);
+    fill_ = ui::block(c.parent, theme::ACCENT);
+    lv_obj_set_size(fill_, vertical_ ? bar_w_ : 1, vertical_ ? 1 : bar_h_);
+    lv_obj_set_pos(fill_, bar_x_, bar_y_);
+
+    // The room beside or above the bar holds the icon, the number and, if wanted, the name.
+    const int room_w = vertical_ ? bar_x_ - pad : w_ - 2 * pad;
+    const int room_h = vertical_ ? h_ - 2 * pad : bar_y_ - pad;
+    icon_ = ui::label(c.parent, Font::ICON, theme::INK);
+    ui::set_text(icon_, ui::icon(icon_code("", c.options["icon_name"] | "", fallback)));
+    const int ih = ui::line_height(Font::ICON);
+    number_ = ui::label(c.parent, Font::TITLE, theme::INK);
+    const int nh = ui::line_height(Font::TITLE);
+    lv_obj_set_style_text_align(number_, vertical_ ? LV_TEXT_ALIGN_CENTER : LV_TEXT_ALIGN_RIGHT, 0);
+    if (vertical_) {
+      lv_obj_set_width(icon_, room_w);
+      lv_obj_set_style_text_align(icon_, LV_TEXT_ALIGN_CENTER, 0);
+      lv_obj_set_width(number_, room_w);
+      const int top = pad + (room_h - ih - nh) / 2;
+      lv_obj_set_pos(icon_, pad, top);
+      lv_obj_set_pos(number_, pad, top + ih);
+    } else {
+      lv_obj_set_width(icon_, ih * 3 / 2);
+      lv_obj_set_pos(icon_, pad, pad + (room_h - ih) / 2);
+      lv_obj_set_width(number_, room_w / 2);
+      lv_obj_set_pos(number_, w_ - pad - room_w / 2, pad + (room_h - nh) / 2);
+    }
+    if (show_name) {
+      name_ = ui::label(c.parent, Font::BODY, theme::MUTED);
+      ui::set_text(name_, name);
+      const int bh = ui::line_height(Font::BODY);
+      if (vertical_) {
+        lv_obj_set_width(name_, room_w);
+        lv_obj_set_style_text_align(name_, LV_TEXT_ALIGN_CENTER, 0);
+        lv_obj_set_pos(name_, pad, pad);
+      } else {
+        lv_obj_set_width(name_, room_w / 2 - ih);
+        lv_obj_set_pos(name_, pad + ih * 3 / 2 + pad, pad + (room_h - bh) / 2);
+      }
+    }
+    apply();
+  }
+
+  void on_state(JsonObjectConst data) override {
+    const char *s = data["state"] | "";
+    gone_ = strcmp(s, "unavailable") == 0 || strcmp(s, "unknown") == 0;
+    JsonObjectConst a = data["attributes"];
+    const bool on = strcmp(s, "on") == 0 || strcmp(s, "open") == 0 || strcmp(s, "opening") == 0;
+    float v = 0;
+    if (kind_ == LIGHT) v = on ? (a["brightness"] | 0.0f) * 100.0f / 255.0f : 0;
+    else if (kind_ == COVER) v = a["current_position"] | (on ? 100.0f : 0.0f);
+    else v = on ? (a["percentage"] | 0.0f) : 0;
+    value_ = v < 0 ? 0 : v > 100 ? 100 : static_cast<int>(v + 0.5f);
+    apply();
+  }
+
+  void on_tap() override {
+    if (entity_.empty()) return;
+    const tessera::Point p = tessera::tap_point();
+    if (p.x < 0 || p.y < 0) return;
+    float frac = vertical_ ? 1.0f - static_cast<float>(p.y - bar_y_) / bar_h_ : static_cast<float>(p.x - bar_x_) / bar_w_;
+    frac = frac < 0 ? 0 : frac > 1 ? 1 : frac;
+    const int v = (static_cast<int>(frac * 100 + 2.5f) / 5) * 5;
+    const std::string text = std::to_string(v);
+    if (kind_ == LIGHT) {
+      if (v == 0) tessera::action("light.turn_off", entity_);
+      else tessera::action("light.turn_on", entity_, "brightness_pct", text);
+    } else if (kind_ == COVER) {
+      tessera::action("cover.set_cover_position", entity_, "position", text);
+    } else {
+      if (v == 0) tessera::action("fan.turn_off", entity_);
+      else tessera::action("fan.set_percentage", entity_, "percentage", text);
+    }
+    value_ = v;
+    apply();
+  }
+
+  void on_theme() override { apply(); }
+
+ private:
+  enum Kind { LIGHT, COVER, FAN };
+
+  void apply() {
+    const int v = gone_ ? 0 : value_;
+    if (vertical_) {
+      const int fh = std::max(1, bar_h_ * v / 100);
+      lv_obj_set_size(fill_, bar_w_, fh);
+      lv_obj_set_pos(fill_, bar_x_, bar_y_ + bar_h_ - fh);
+    } else {
+      lv_obj_set_size(fill_, std::max(1, bar_w_ * v / 100), bar_h_);
+      lv_obj_set_pos(fill_, bar_x_, bar_y_);
+    }
+    paint_block(fill_, paint_, theme::ACCENT);
+    paint_label(icon_, gone_ ? Paint::NORMAL : paint_, gone_ ? theme::MUTED : theme::INK);
+    ui::set_text(number_, gone_ ? "-" : std::to_string(v) + "%");
+    ui::set_color(number_, gone_ ? theme::MUTED : theme::INK);
+    if (name_) ui::set_color(name_, theme::MUTED);
+  }
+
+  std::string entity_;
+  Kind kind_ = LIGHT;
+  bool vertical_ = false, gone_ = false;
+  int w_ = 0, h_ = 0, bar_x_ = 0, bar_y_ = 0, bar_w_ = 1, bar_h_ = 1, value_ = 0;
+  Paint paint_ = Paint::ACCENT;
+  lv_obj_t *track_{}, *fill_{}, *icon_{}, *number_{}, *name_{};
+};
+
 void IconButton::setup() {
   add_tile("button", [this]() { return new ButtonTile(false); });
   add_tile("switch", [this]() { return new ButtonTile(true); });
   add_tile("light", [this]() { return new ButtonTile(true); });
+  add_tile("slider", [this]() { return new SliderTile(); });
 }
 
 }  // namespace esphome::icon_button
