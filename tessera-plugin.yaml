@@ -1,5 +1,5 @@
 id: icon_button
-version: 0.5.0
+version: 0.6.0
 api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
@@ -33,6 +33,8 @@ tiles:
           choices: [{ value: none, label: border_none }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
       - { id: border_width, kind: choice, label: border_width, hint: border_width_hint, default: thin,
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
+      - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
+          choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }] }
       - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }
   # The same, for a light, a switch, an input_boolean or a fan: a tap toggles it and the tile follows its state.
   - id: switch
@@ -52,4 +54,27 @@ tiles:
           choices: [{ value: none, label: border_none }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
       - { id: border_width, kind: choice, label: border_width, hint: border_width_hint, default: thin,
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
+      - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
+          choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }] }
+      - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }
+  # The same for lights only: the editor lists only light.* entities.
+  - id: light
+    name: tile_name_light
+    icon: lightbulb
+    sizes: { min: 1x1, max: 4x4 }
+    memory: 300
+    domains: [light]
+    example: tile_example_light
+    preview: { title: "{name}" }
+    options:
+      - { id: icon, kind: choice, label: icon, hint: icon_hint, default: lightbulb,
+          choices: [{ value: plus, label: icon_plus }, { value: minus, label: icon_minus }, { value: chevron_up, label: icon_chevron_up }, { value: chevron_down, label: icon_chevron_down }, { value: arrow_up, label: icon_arrow_up }, { value: arrow_down, label: icon_arrow_down }, { value: fire, label: icon_fire }, { value: power, label: icon_power }, { value: play, label: icon_play }, { value: pause, label: icon_pause }, { value: stop, label: icon_stop }, { value: check, label: icon_check }, { value: close, label: icon_close }, { value: lock, label: icon_lock }, { value: lock_open, label: icon_lock_open }, { value: bell, label: icon_bell }, { value: home, label: icon_home }, { value: volume_plus, label: icon_volume_plus }, { value: volume_minus, label: icon_volume_minus }, { value: skip_next, label: icon_skip_next }, { value: skip_previous, label: icon_skip_previous }, { value: thermometer, label: icon_thermometer }, { value: thermostat, label: icon_thermostat }, { value: radiator, label: icon_radiator }, { value: snowflake, label: icon_snowflake }, { value: fan, label: icon_fan }, { value: lightbulb, label: icon_lightbulb }, { value: flash, label: icon_flash }, { value: script, label: icon_script }, { value: tap, label: icon_tap }] }
+      - { id: color, kind: choice, label: color_on, hint: color_on_hint, default: busy,
+          choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
+      - { id: border, kind: choice, label: border, hint: border_hint, default: none,
+          choices: [{ value: none, label: border_none }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
+      - { id: border_width, kind: choice, label: border_width, hint: border_width_hint, default: thin,
+          choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
+      - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
+          choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }] }
       - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }

@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Icon button",
-    "summary": "Icon-only tiles: one runs a script, the other toggles a light, switch, input_boolean or fan and shows whether it is on.",
+    "summary": "Icon-only tiles: one runs a script, one toggles a light, one toggles a switch, input_boolean or fan; both follow whether it is on.",
     "tile_name": "Icon button",
     "tile_example": "A plus or minus button",
     "icon": "Icon",
@@ -62,6 +62,12 @@
     "color_on": "Colour when on",
     "color_on_hint": "The colour of the icon (and the border) while the light or switch is on.",
     "color_purple": "Purple",
-    "color_cyan": "Cyan"
+    "color_cyan": "Cyan",
+    "icon_size": "Icon size",
+    "icon_size_hint": "Normal is large; small suits a small tile.",
+    "size_normal": "Normal",
+    "size_small": "Small",
+    "tile_name_light": "Light button",
+    "tile_example_light": "A button for a light"
   }
 }

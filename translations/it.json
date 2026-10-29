@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Tasto con icona",
-    "summary": "Riquadri con solo icona: uno esegue uno script, l'altro accende/spegne una luce, un interruttore, un input_boolean o un ventilatore e mostra se è acceso.",
+    "summary": "Riquadri con solo icona: uno esegue uno script, uno accende/spegne una luce, uno un interruttore, input_boolean o ventilatore; gli ultimi due mostrano se è acceso.",
     "tile_name": "Tasto con icona",
     "tile_example": "Un tasto più o meno",
     "icon": "Icona",
@@ -32,6 +32,12 @@
     "color_on": "Colore da acceso",
     "color_on_hint": "Il colore dell'icona (e del bordo) mentre la luce o l'interruttore è acceso.",
     "color_purple": "Viola",
-    "color_cyan": "Azzurro"
+    "color_cyan": "Azzurro",
+    "icon_size": "Dimensione icona",
+    "icon_size_hint": "Normale è grande; piccola va bene per un riquadro piccolo.",
+    "size_normal": "Normale",
+    "size_small": "Piccola",
+    "tile_name_light": "Tasto luce",
+    "tile_example_light": "Un tasto per una luce"
   }
 }

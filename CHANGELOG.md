@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+- New tile: a light button that lists only lights.
+- New option: the icon's size, normal or small.
+
 ## 0.5.0
 - Two more colours: purple and cyan.
 - Border position removed again: only the border's colour and width remain.

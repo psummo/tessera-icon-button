@@ -113,11 +113,12 @@ class ButtonTile : public tessera::Tile {
       lv_obj_set_pos(inner, t, t);
     }
 
-    icon_ = ui::label(c.parent, Font::ICON, theme::INK);
+    const Font face = strcmp(c.options["icon_size"] | "normal", "small") == 0 ? Font::ICON_SMALL : Font::ICON;
+    icon_ = ui::label(c.parent, face, theme::INK);
     ui::set_text(icon_, ui::icon(icon_code(c.options["icon"] | (follows_ ? "lightbulb" : "plus"))));
     lv_obj_set_width(icon_, width);
     lv_obj_set_style_text_align(icon_, LV_TEXT_ALIGN_CENTER, 0);
-    const int ih = ui::line_height(Font::ICON);
+    const int ih = ui::line_height(face);
 
     int nh = 0;
     if (show_name_ && !name.empty()) {
@@ -181,6 +182,7 @@ class ButtonTile : public tessera::Tile {
 void IconButton::setup() {
   add_tile("button", [this]() { return new ButtonTile(false); });
   add_tile("switch", [this]() { return new ButtonTile(true); });
+  add_tile("light", [this]() { return new ButtonTile(true); });
 }
 
 }  // namespace esphome::icon_button
