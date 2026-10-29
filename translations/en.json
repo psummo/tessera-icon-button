@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Icon button",
-    "summary": "A tile with only an icon: tap it to run a script, a scene or a button of Home Assistant.",
+    "summary": "A tile with only an icon: tap it to run a script of Home Assistant.",
     "tile_name": "Icon button",
     "tile_example": "A plus or minus button",
     "icon": "Icon",
@@ -41,6 +41,13 @@
     "icon_lightbulb": "Light bulb",
     "icon_flash": "Lightning",
     "icon_script": "Script",
-    "icon_tap": "Button"
+    "icon_tap": "Button",
+    "color": "Colour",
+    "color_hint": "The colour of the icon.",
+    "color_normal": "Normal",
+    "color_accent": "Blue",
+    "color_busy": "Amber",
+    "color_alert": "Red",
+    "color_good": "Green"
   }
 }

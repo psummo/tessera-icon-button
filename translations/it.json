@@ -5,12 +5,19 @@
   "screen": {},
   "app": {
     "name": "Tasto con icona",
-    "summary": "Un riquadro con solo un'icona: toccalo per eseguire uno script, una scena o un pulsante di Home Assistant.",
+    "summary": "Un riquadro con solo un'icona: toccalo per eseguire uno script di Home Assistant.",
     "tile_name": "Tasto con icona",
     "tile_example": "Un tasto più o meno",
     "icon": "Icona",
     "icon_hint": "L'icona mostrata dal riquadro.",
     "show_name": "Mostra il nome",
-    "show_name_hint": "Scrive il nome del riquadro sotto l'icona."
+    "show_name_hint": "Scrive il nome del riquadro sotto l'icona.",
+    "color": "Colore",
+    "color_hint": "Il colore dell'icona.",
+    "color_normal": "Normale",
+    "color_accent": "Blu",
+    "color_busy": "Ambra",
+    "color_alert": "Rosso",
+    "color_good": "Verde"
   }
 }

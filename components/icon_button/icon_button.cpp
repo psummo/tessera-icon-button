@@ -51,24 +51,26 @@ static uint32_t icon_code(const char *name) {
   return ICONS[0].code;
 }
 
-// The Home Assistant action a tap sends, chosen from the domain of the entity.
-static const char *service_for(const std::string &entity) {
-  if (entity.rfind("script.", 0) == 0) return "script.turn_on";
-  if (entity.rfind("scene.", 0) == 0) return "scene.turn_on";
-  if (entity.rfind("input_button.", 0) == 0) return "input_button.press";
-  if (entity.rfind("button.", 0) == 0) return "button.press";
-  return nullptr;
+// The colour option (normal, accent, busy, alert, good) as a tone of the theme.
+static tessera::Tone tone_for(const char *name) {
+  if (strcmp(name, "accent") == 0) return tessera::Tone::ACCENT;
+  if (strcmp(name, "busy") == 0) return tessera::Tone::BUSY;
+  if (strcmp(name, "alert") == 0) return tessera::Tone::ALERT;
+  if (strcmp(name, "good") == 0) return tessera::Tone::GOOD;
+  return tessera::Tone::NORMAL;
 }
 
 class ButtonTile : public tessera::Tile {
  public:
   void create(const tessera::TileContext &c) override {
     entity_ = c.entity ? c.entity : "";
+    tone_ = tone_for(c.options["color"] | "normal");
     show_name_ = c.options["show_name"] | false;
     const std::string name = c.name ? c.name : "";
     const int width = c.width, height = c.height;
 
     icon_ = ui::label(c.parent, Font::ICON, entity_.empty() ? theme::MUTED : theme::INK);
+    ui::set_tone(icon_, entity_.empty() ? tessera::Tone::NORMAL : tone_, entity_.empty() ? theme::MUTED : theme::INK);
     ui::set_text(icon_, ui::icon(icon_code(c.options["icon"] | "plus")));
     lv_obj_set_width(icon_, width);
     lv_obj_set_style_text_align(icon_, LV_TEXT_ALIGN_CENTER, 0);
@@ -88,17 +90,17 @@ class ButtonTile : public tessera::Tile {
   }
 
   void on_tap() override {
-    const char *service = service_for(entity_);
-    if (service) tessera::action(service, entity_);
+    if (!entity_.empty()) tessera::action("script.turn_on", entity_);
   }
 
   void on_theme() override {
-    ui::set_color(icon_, entity_.empty() ? theme::MUTED : theme::INK);
+    ui::set_tone(icon_, entity_.empty() ? tessera::Tone::NORMAL : tone_, entity_.empty() ? theme::MUTED : theme::INK);
     if (name_) ui::set_color(name_, theme::MUTED);
   }
 
  private:
   std::string entity_;
+  tessera::Tone tone_ = tessera::Tone::NORMAL;
   bool show_name_ = false;
   lv_obj_t *icon_{}, *name_{};
 };

@@ -1,6 +1,6 @@
 id: icon_button
-version: 0.1.0
-api: "0.8"
+version: 0.2.0
+api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
 license: MIT
@@ -12,19 +12,21 @@ boards: any
 flash_kb: 4
 
 permissions:
-  home_assistant_actions: [script.turn_on, scene.turn_on, button.press, input_button.press]
+  home_assistant_actions: [script.turn_on]
 
 tiles:
-  # A tile that is only an icon: tapping it runs a script, a scene or a button of Home Assistant.
+  # A tile that is only an icon: tapping it runs a script of Home Assistant.
   - id: button
     name: tile_name
     icon: gesture-tap-button
     sizes: { min: 1x1, max: 4x4 }
     memory: 300
-    domains: [script, scene, button, input_button]
+    domains: [script]
     example: tile_example
     preview: { title: "{name}" }
     options:
       - { id: icon, kind: choice, label: icon, hint: icon_hint, default: plus,
           choices: [{ value: plus, label: icon_plus }, { value: minus, label: icon_minus }, { value: chevron_up, label: icon_chevron_up }, { value: chevron_down, label: icon_chevron_down }, { value: arrow_up, label: icon_arrow_up }, { value: arrow_down, label: icon_arrow_down }, { value: fire, label: icon_fire }, { value: power, label: icon_power }, { value: play, label: icon_play }, { value: pause, label: icon_pause }, { value: stop, label: icon_stop }, { value: check, label: icon_check }, { value: close, label: icon_close }, { value: lock, label: icon_lock }, { value: lock_open, label: icon_lock_open }, { value: bell, label: icon_bell }, { value: home, label: icon_home }, { value: volume_plus, label: icon_volume_plus }, { value: volume_minus, label: icon_volume_minus }, { value: skip_next, label: icon_skip_next }, { value: skip_previous, label: icon_skip_previous }, { value: thermometer, label: icon_thermometer }, { value: thermostat, label: icon_thermostat }, { value: radiator, label: icon_radiator }, { value: snowflake, label: icon_snowflake }, { value: fan, label: icon_fan }, { value: lightbulb, label: icon_lightbulb }, { value: flash, label: icon_flash }, { value: script, label: icon_script }, { value: tap, label: icon_tap }] }
+      - { id: color, kind: choice, label: color, hint: color_hint, default: normal,
+          choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }] }
       - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }
