@@ -9,7 +9,7 @@ a thermostat, a play button, a lock.
 
 1. Add the plugin to a screen in Tessera. The screen builds once.
 2. In Layout, place the **Icon button** tile from the library's Plugins group.
-3. In the inspector, choose the script it runs, then the icon and its colour. Optionally write the name under it.
+3. In the inspector, choose the script it runs, then the icon and its colour. Optionally write a few words under the icon.
 
 ## Good to know
 

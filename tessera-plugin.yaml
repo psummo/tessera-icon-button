@@ -1,5 +1,5 @@
 id: icon_button
-version: 0.8.1
+version: 0.9.0
 api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
@@ -36,7 +36,7 @@ tiles:
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
       - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
           choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }, { value: large, label: size_large }, { value: xlarge, label: size_xlarge }] }
-      - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }
+      - { id: label, kind: text, label: label_text, hint: label_text_hint, default: "" }
   # The same, for a light, a switch, an input_boolean or a fan: a tap toggles it and the tile follows its state.
   - id: switch
     name: tile_name_switch
@@ -58,7 +58,7 @@ tiles:
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
       - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
           choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }, { value: large, label: size_large }, { value: xlarge, label: size_xlarge }] }
-      - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }
+      - { id: label, kind: text, label: label_text, hint: label_text_hint, default: "" }
   # The same for lights only: the editor lists only light.* entities.
   - id: light
     name: tile_name_light
@@ -80,7 +80,7 @@ tiles:
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
       - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
           choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }, { value: large, label: size_large }, { value: xlarge, label: size_xlarge }] }
-      - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }
+      - { id: label, kind: text, label: label_text, hint: label_text_hint, default: "" }
   # A slider for a dimmable light, a cover (blind, shutter) or a fan: tap where the bar should reach.
   - id: slider
     name: tile_name_slider
@@ -88,7 +88,7 @@ tiles:
     sizes: { min: 1x1, max: 4x4 }
     memory: 600
     domains: [light, cover, fan]
-    attributes: [brightness, current_position, percentage]
+    attributes: [brightness, current_position, percentage, supported_color_modes]
     example: tile_example_slider
     preview: { title: "{name}" }
     options:
@@ -97,4 +97,55 @@ tiles:
           choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
       - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,
           choices: [{ value: auto, label: orient_auto }, { value: horizontal, label: orient_horizontal }, { value: vertical, label: orient_vertical }] }
-      - { id: show_name, kind: toggle, label: show_name, hint: show_name_hint, default: false }
+      - { id: show_value, kind: toggle, label: show_value, hint: show_value_hint, default: false }
+
+  - id: slider_light
+    name: tile_name_slider_light
+    icon: lightbulb
+    sizes: { min: 1x1, max: 4x4 }
+    memory: 600
+    domains: [light]
+    attributes: [brightness, current_position, percentage, supported_color_modes]
+    example: tile_example_slider_light
+    preview: { title: "{name}" }
+    options:
+      - { id: icon_name, kind: text, label: icon_name, hint: icon_name_hint, default: "" }
+      - { id: color, kind: choice, label: color, hint: color_hint, default: accent,
+          choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
+      - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,
+          choices: [{ value: auto, label: orient_auto }, { value: horizontal, label: orient_horizontal }, { value: vertical, label: orient_vertical }] }
+      - { id: show_value, kind: toggle, label: show_value, hint: show_value_hint, default: false }
+
+  - id: slider_cover
+    name: tile_name_slider_cover
+    icon: window-shutter
+    sizes: { min: 1x1, max: 4x4 }
+    memory: 600
+    domains: [cover]
+    attributes: [brightness, current_position, percentage, supported_color_modes]
+    example: tile_example_slider_cover
+    preview: { title: "{name}" }
+    options:
+      - { id: icon_name, kind: text, label: icon_name, hint: icon_name_hint, default: "" }
+      - { id: color, kind: choice, label: color, hint: color_hint, default: accent,
+          choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
+      - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,
+          choices: [{ value: auto, label: orient_auto }, { value: horizontal, label: orient_horizontal }, { value: vertical, label: orient_vertical }] }
+      - { id: show_value, kind: toggle, label: show_value, hint: show_value_hint, default: false }
+
+  - id: slider_fan
+    name: tile_name_slider_fan
+    icon: fan
+    sizes: { min: 1x1, max: 4x4 }
+    memory: 600
+    domains: [fan]
+    attributes: [brightness, current_position, percentage, supported_color_modes]
+    example: tile_example_slider_fan
+    preview: { title: "{name}" }
+    options:
+      - { id: icon_name, kind: text, label: icon_name, hint: icon_name_hint, default: "" }
+      - { id: color, kind: choice, label: color, hint: color_hint, default: accent,
+          choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
+      - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,
+          choices: [{ value: auto, label: orient_auto }, { value: horizontal, label: orient_horizontal }, { value: vertical, label: orient_vertical }] }
+      - { id: show_value, kind: toggle, label: show_value, hint: show_value_hint, default: false }

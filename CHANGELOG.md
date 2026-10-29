@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0
+- Separate sliders for lights, blinds and fans (the general slider stays).
+- The slider is thicker, keeps room from the tile's edges, and shows the percentage only if asked.
+- A light that only switches on and off becomes a toggle on the slider.
+- The name under the icon is now a text of your own (it showed the Home Assistant name before).
+
 ## 0.8.1
 - The slider can be a single cell again, so it can be placed and resized on screens with two columns; it works best on 2 cells or more.
 

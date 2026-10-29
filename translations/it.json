@@ -10,8 +10,6 @@
     "tile_example": "Un tasto più o meno",
     "icon": "Icona",
     "icon_hint": "L'icona mostrata dal riquadro.",
-    "show_name": "Mostra il nome",
-    "show_name_hint": "Scrive il nome del riquadro sotto l'icona.",
     "color": "Colore",
     "color_hint": "Il colore dell'icona.",
     "color_normal": "Normale",
@@ -67,6 +65,16 @@
     "orientation_hint": "Auto segue la forma del riquadro: un riquadro più alto è verticale.",
     "orient_auto": "Auto",
     "orient_horizontal": "Orizzontale",
-    "orient_vertical": "Verticale"
+    "orient_vertical": "Verticale",
+    "label_text": "Testo sotto l'icona",
+    "label_text_hint": "Facoltativo: poche parole tue sotto l'icona.",
+    "show_value": "Mostra la percentuale",
+    "show_value_hint": "Scrive il livello come numero sullo slider.",
+    "tile_name_slider_light": "Slider luce",
+    "tile_example_slider_light": "Meglio su 2 caselle o più: slider per luce dimmerabile",
+    "tile_name_slider_cover": "Slider tapparella",
+    "tile_example_slider_cover": "Meglio su 2 caselle o più: slider per tapparella",
+    "tile_name_slider_fan": "Slider ventilatore",
+    "tile_example_slider_fan": "Meglio su 2 caselle o più: slider per velocità del ventilatore"
   }
 }

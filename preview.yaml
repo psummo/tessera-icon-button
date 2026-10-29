@@ -6,7 +6,7 @@ tiles:
     entity: script.temperature_up
   - tile: button
     name: Meno
-    options: { icon: minus, show_name: true }
+    options: { icon: minus, label: Meno }
     sizes: [1x1]
     entity: script.temperature_down
   - tile: switch

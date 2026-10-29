@@ -10,8 +10,6 @@
     "tile_example": "A plus or minus button",
     "icon": "Icon",
     "icon_hint": "The icon the tile shows.",
-    "show_name": "Show the name",
-    "show_name_hint": "Writes the tile's name under the icon.",
     "icon_plus": "Plus",
     "icon_minus": "Minus",
     "icon_chevron_up": "Chevron up",
@@ -97,6 +95,16 @@
     "orientation_hint": "Auto follows the shape of the tile: a taller tile is vertical.",
     "orient_auto": "Auto",
     "orient_horizontal": "Horizontal",
-    "orient_vertical": "Vertical"
+    "orient_vertical": "Vertical",
+    "label_text": "Text under the icon",
+    "label_text_hint": "Optional: a few words of your own under the icon.",
+    "show_value": "Show the percentage",
+    "show_value_hint": "Writes the level as a number on the slider.",
+    "tile_name_slider_light": "Light slider",
+    "tile_example_slider_light": "Best on 2 cells or more: a dimmer slider",
+    "tile_name_slider_cover": "Blind slider",
+    "tile_example_slider_cover": "Best on 2 cells or more: a blind or shutter slider",
+    "tile_name_slider_fan": "Fan slider",
+    "tile_example_slider_fan": "Best on 2 cells or more: a fan speed slider"
   }
 }
