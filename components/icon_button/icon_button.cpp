@@ -535,7 +535,9 @@ class SliderTile : public tessera::Tile {
     vertical_ = strcmp(dir, "vertical") == 0 || (strcmp(dir, "auto") == 0 && h_ > w_);
     paint_ = paint_for(c.options["color"] | "accent");
     show_value_ = c.options["show_value"] | false;
+    invert_ = c.options["invert"] | false;
     kind_ = entity_.rfind("cover.", 0) == 0 ? COVER : entity_.rfind("fan.", 0) == 0 ? FAN : LIGHT;
+    if (kind_ != COVER) invert_ = false;
     const char *fallback = kind_ == COVER ? "window-shutter" : kind_ == FAN ? "fan" : "lightbulb";
 
     // Room from the edges of the tile, so a finger near them still lands on the slider, and a thick bar.
@@ -595,6 +597,7 @@ class SliderTile : public tessera::Tile {
       v = !on ? 0 : dimmable_ ? (a["brightness"] | 255.0f) * 100.0f / 255.0f : 100.0f;
     } else if (kind_ == COVER) {
       v = a["current_position"] | (on ? 100.0f : 0.0f);
+      if (invert_) v = 100.0f - v;  // the bar shows how closed it is
     } else {
       v = on ? (a["percentage"] | 100.0f) : 0;
     }
@@ -610,7 +613,8 @@ class SliderTile : public tessera::Tile {
     }
     const tessera::Point p = tessera::tap_point();
     if (p.x < 0 || p.y < 0) return;
-    float frac = vertical_ ? 1.0f - static_cast<float>(p.y - bar_y_) / bar_h_ : static_cast<float>(p.x - bar_x_) / bar_w_;
+    float frac = vertical_ ? static_cast<float>(p.y - bar_y_) / bar_h_ : static_cast<float>(p.x - bar_x_) / bar_w_;
+    if (vertical_ != invert_) frac = 1.0f - frac;  // a bar from the bottom or the left; reversed it starts at the top or the right
     frac = frac < 0 ? 0 : frac > 1 ? 1 : frac;
     const int v = (static_cast<int>(frac * 100 + 2.5f) / 5) * 5;
     const std::string text = std::to_string(v);
@@ -618,7 +622,7 @@ class SliderTile : public tessera::Tile {
       if (v == 0) tessera::action("light.turn_off", entity_);
       else tessera::action("light.turn_on", entity_, "brightness_pct", text);
     } else if (kind_ == COVER) {
-      tessera::action("cover.set_cover_position", entity_, "position", text);
+      tessera::action("cover.set_cover_position", entity_, "position", std::to_string(invert_ ? 100 - v : v));
     } else {
       if (v == 0) tessera::action("fan.turn_off", entity_);
       else tessera::action("fan.set_percentage", entity_, "percentage", text);
@@ -637,10 +641,11 @@ class SliderTile : public tessera::Tile {
     if (vertical_) {
       const int fh = std::max(1, bar_h_ * v / 100);
       lv_obj_set_size(fill_, bar_w_, fh);
-      lv_obj_set_pos(fill_, bar_x_, bar_y_ + bar_h_ - fh);
+      lv_obj_set_pos(fill_, bar_x_, invert_ ? bar_y_ : bar_y_ + bar_h_ - fh);
     } else {
-      lv_obj_set_size(fill_, std::max(1, bar_w_ * v / 100), bar_h_);
-      lv_obj_set_pos(fill_, bar_x_, bar_y_);
+      const int fw = std::max(1, bar_w_ * v / 100);
+      lv_obj_set_size(fill_, fw, bar_h_);
+      lv_obj_set_pos(fill_, invert_ ? bar_x_ + bar_w_ - fw : bar_x_, bar_y_);
     }
     paint_block(fill_, paint_, theme::ACCENT);
     paint_label(icon_, gone_ ? Paint::NORMAL : paint_, gone_ ? theme::MUTED : theme::INK);
@@ -650,7 +655,7 @@ class SliderTile : public tessera::Tile {
 
   std::string entity_;
   Kind kind_ = LIGHT;
-  bool vertical_ = false, gone_ = false, show_value_ = false, dimmable_ = true;
+  bool vertical_ = false, gone_ = false, show_value_ = false, dimmable_ = true, invert_ = false;
   int w_ = 0, h_ = 0, bar_x_ = 0, bar_y_ = 0, bar_w_ = 1, bar_h_ = 1, value_ = 0;
   Paint paint_ = Paint::ACCENT;
   lv_obj_t *track_{}, *fill_{}, *icon_{}, *number_{};

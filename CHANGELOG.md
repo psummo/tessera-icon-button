@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.0
+- Blind slider: a Reversed option, showing how closed the blind is, filling from the top or the right.
+
 ## 0.9.0
 - Separate sliders for lights, blinds and fans (the general slider stays).
 - The slider is thicker, keeps room from the tile's edges, and shows the percentage only if asked.

@@ -105,6 +105,8 @@
     "tile_name_slider_cover": "Blind slider",
     "tile_example_slider_cover": "Best on 2 cells or more: a blind or shutter slider",
     "tile_name_slider_fan": "Fan slider",
-    "tile_example_slider_fan": "Best on 2 cells or more: a fan speed slider"
+    "tile_example_slider_fan": "Best on 2 cells or more: a fan speed slider",
+    "invert": "Reversed",
+    "invert_hint": "The bar shows how closed the blind is and fills from the top (or from the right), like a blind coming down."
   }
 }

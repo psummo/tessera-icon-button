@@ -1,5 +1,5 @@
 id: icon_button
-version: 0.9.0
+version: 0.10.0
 api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
@@ -131,6 +131,7 @@ tiles:
           choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
       - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,
           choices: [{ value: auto, label: orient_auto }, { value: horizontal, label: orient_horizontal }, { value: vertical, label: orient_vertical }] }
+      - { id: invert, kind: toggle, label: invert, hint: invert_hint, default: false }
       - { id: show_value, kind: toggle, label: show_value, hint: show_value_hint, default: false }
 
   - id: slider_fan

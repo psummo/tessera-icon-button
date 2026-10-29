@@ -75,6 +75,8 @@
     "tile_name_slider_cover": "Slider tapparella",
     "tile_example_slider_cover": "Meglio su 2 caselle o più: slider per tapparella",
     "tile_name_slider_fan": "Slider ventilatore",
-    "tile_example_slider_fan": "Meglio su 2 caselle o più: slider per velocità del ventilatore"
+    "tile_example_slider_fan": "Meglio su 2 caselle o più: slider per velocità del ventilatore",
+    "invert": "Invertito",
+    "invert_hint": "La barra mostra quanto è chiusa la tapparella e si riempie dall'alto (o da destra), come una tapparella che scende."
   }
 }
