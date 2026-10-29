@@ -18,6 +18,14 @@
     "color_accent": "Blu",
     "color_busy": "Ambra",
     "color_alert": "Rosso",
-    "color_good": "Verde"
+    "color_good": "Verde",
+    "border": "Bordo",
+    "border_hint": "Una linea colorata attorno al riquadro, per distinguere i tasti.",
+    "border_none": "Nessuno",
+    "border_width": "Spessore del bordo",
+    "border_width_hint": "Solo se hai scelto un colore del bordo.",
+    "border_thin": "Sottile",
+    "border_normal": "Medio",
+    "border_thick": "Spesso"
   }
 }

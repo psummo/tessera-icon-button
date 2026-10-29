@@ -48,6 +48,14 @@
     "color_accent": "Blue",
     "color_busy": "Amber",
     "color_alert": "Red",
-    "color_good": "Green"
+    "color_good": "Green",
+    "border": "Border",
+    "border_hint": "A thin line around the tile in a colour, to tell buttons apart.",
+    "border_none": "None",
+    "border_width": "Border width",
+    "border_width_hint": "Only when a border colour is chosen.",
+    "border_thin": "Thin",
+    "border_normal": "Medium",
+    "border_thick": "Thick"
   }
 }

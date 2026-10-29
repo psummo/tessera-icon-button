@@ -69,6 +69,21 @@ class ButtonTile : public tessera::Tile {
     const std::string name = c.name ? c.name : "";
     const int width = c.width, height = c.height;
 
+    // A thin frame: a block in the border's colour with a card-coloured block inside it, both made before the icon so the
+    // icon is drawn on top.
+    const char *border = c.options["border"] | "none";
+    if (strcmp(border, "none") != 0) {
+      const char *w = c.options["border_width"] | "thin";
+      const int t = ui::px(strcmp(w, "thick") == 0 ? 5 : strcmp(w, "normal") == 0 ? 3 : 2);
+      lv_obj_t *outer = ui::block(c.parent, theme::CARD);
+      ui::set_fill(outer, tone_for(border), theme::CARD);
+      lv_obj_set_size(outer, width, height);
+      lv_obj_set_pos(outer, 0, 0);
+      lv_obj_t *inner = ui::block(c.parent, theme::CARD);
+      lv_obj_set_size(inner, width - 2 * t, height - 2 * t);
+      lv_obj_set_pos(inner, t, t);
+    }
+
     icon_ = ui::label(c.parent, Font::ICON, entity_.empty() ? theme::MUTED : theme::INK);
     ui::set_tone(icon_, entity_.empty() ? tessera::Tone::NORMAL : tone_, entity_.empty() ? theme::MUTED : theme::INK);
     ui::set_text(icon_, ui::icon(icon_code(c.options["icon"] | "plus")));

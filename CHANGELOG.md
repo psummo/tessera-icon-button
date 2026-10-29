@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.0
+- New options: a coloured border and its width.
+
 ## 0.2.0
 - Only scripts can be chosen, so the editor's list is short.
 - New option: the colour of the icon.
