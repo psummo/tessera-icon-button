@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0
+- Icon size: large and extra large (the icon drawn scaled).
+- Icon by name: any of the 349 icons of Tessera's set; the list has 48 of them (ICONS.md has all names).
+
 ## 0.6.0
 - New tile: a light button that lists only lights.
 - New option: the icon's size, normal or small.
