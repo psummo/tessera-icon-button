@@ -51,13 +51,39 @@ static uint32_t icon_code(const char *name) {
   return ICONS[0].code;
 }
 
-// The colour option (normal, accent, busy, alert, good) as a tone of the theme.
-static tessera::Tone tone_for(const char *name) {
-  if (strcmp(name, "accent") == 0) return tessera::Tone::ACCENT;
-  if (strcmp(name, "busy") == 0) return tessera::Tone::BUSY;
-  if (strcmp(name, "alert") == 0) return tessera::Tone::ALERT;
-  if (strcmp(name, "good") == 0) return tessera::Tone::GOOD;
-  return tessera::Tone::NORMAL;
+// The colour options as the theme's own colours: four tones of the screen and two of the Tessera mark.
+enum class Paint : uint8_t { NORMAL, ACCENT, BUSY, ALERT, GOOD, PURPLE, CYAN };
+
+static Paint paint_for(const char *name) {
+  if (strcmp(name, "accent") == 0) return Paint::ACCENT;
+  if (strcmp(name, "busy") == 0) return Paint::BUSY;
+  if (strcmp(name, "alert") == 0) return Paint::ALERT;
+  if (strcmp(name, "good") == 0) return Paint::GOOD;
+  if (strcmp(name, "purple") == 0) return Paint::PURPLE;
+  if (strcmp(name, "cyan") == 0) return Paint::CYAN;
+  return Paint::NORMAL;
+}
+
+static tessera::Tone tone_of(Paint p) {
+  switch (p) {
+    case Paint::ACCENT: return tessera::Tone::ACCENT;
+    case Paint::BUSY: return tessera::Tone::BUSY;
+    case Paint::ALERT: return tessera::Tone::ALERT;
+    case Paint::GOOD: return tessera::Tone::GOOD;
+    default: return tessera::Tone::NORMAL;
+  }
+}
+
+static theme::Role role_of(Paint p, theme::Role normal) {
+  return p == Paint::PURPLE ? theme::MARK_PURPLE : p == Paint::CYAN ? theme::MARK_BLUE : normal;
+}
+
+static void paint_label(lv_obj_t *label, Paint p, theme::Role normal) {
+  ui::set_tone(label, tone_of(p), role_of(p, normal));
+}
+
+static void paint_block(lv_obj_t *block, Paint p, theme::Role normal) {
+  ui::set_fill(block, tone_of(p), role_of(p, normal));
 }
 
 // Both tiles: a script tile only sends a tap; a switch tile (follows == true) also follows the state of its entity.
@@ -67,33 +93,24 @@ class ButtonTile : public tessera::Tile {
 
   void create(const tessera::TileContext &c) override {
     entity_ = c.entity ? c.entity : "";
-    tone_ = tone_for(c.options["color"] | "normal");
-    border_tone_ = tone_for(c.options["border"] | "none");
+    tone_ = paint_for(c.options["color"] | "normal");
+    border_tone_ = paint_for(c.options["border"] | "none");
     has_border_ = strcmp(c.options["border"] | "none", "none") != 0;
     show_name_ = c.options["show_name"] | false;
     const std::string name = c.name ? c.name : "";
     const int width = c.width, height = c.height;
 
     // The frame: a block in the border's colour with a card-coloured block set in by the border's width, both made
-    // before the icon so the icon is drawn on top. Outside reaches past the area towards the card's edge, inside is set
-    // in and rounded.
+    // before the icon so the icon is drawn on top.
     if (has_border_) {
       const char *w = c.options["border_width"] | "thin";
       const int t = ui::px(strcmp(w, "thick") == 0 ? 5 : strcmp(w, "normal") == 0 ? 3 : 2);
-      const char *where = c.options["border_position"] | "medium";
-      const bool inside = strcmp(where, "inside") == 0;
-      const int off = strcmp(where, "outside") == 0 ? -ui::px(4) : inside ? ui::px(6) : 0;
-      const int radius = ui::px(18);
       outer_ = ui::block(c.parent, theme::CARD);
-      lv_obj_set_size(outer_, width - 2 * off, height - 2 * off);
-      lv_obj_set_pos(outer_, off, off);
+      lv_obj_set_size(outer_, width, height);
+      lv_obj_set_pos(outer_, 0, 0);
       lv_obj_t *inner = ui::block(c.parent, theme::CARD);
-      lv_obj_set_size(inner, width - 2 * (off + t), height - 2 * (off + t));
-      lv_obj_set_pos(inner, off + t, off + t);
-      if (inside) {
-        lv_obj_set_style_radius(outer_, radius, 0);
-        lv_obj_set_style_radius(inner, radius - t > 0 ? radius - t : 0, 0);
-      }
+      lv_obj_set_size(inner, width - 2 * t, height - 2 * t);
+      lv_obj_set_pos(inner, t, t);
     }
 
     icon_ = ui::label(c.parent, Font::ICON, theme::INK);
@@ -146,18 +163,18 @@ class ButtonTile : public tessera::Tile {
   void apply() {
     const bool lit = !follows_ || on_;
     if (entity_.empty() || gone_) {
-      ui::set_tone(icon_, tessera::Tone::NORMAL, theme::MUTED);
+      paint_label(icon_, Paint::NORMAL, theme::MUTED);
     } else {
-      ui::set_tone(icon_, lit ? tone_ : tessera::Tone::NORMAL, theme::INK);
+      paint_label(icon_, lit ? tone_ : Paint::NORMAL, theme::INK);
     }
-    if (outer_) ui::set_fill(outer_, lit ? border_tone_ : tessera::Tone::NORMAL, theme::TRACK);
+    if (outer_) paint_block(outer_, lit ? border_tone_ : Paint::NORMAL, theme::TRACK);
     if (name_) ui::set_color(name_, theme::MUTED);
   }
 
   std::string entity_;
   bool follows_;
   bool show_name_ = false, has_border_ = false, on_ = false, gone_ = false;
-  tessera::Tone tone_ = tessera::Tone::NORMAL, border_tone_ = tessera::Tone::NORMAL;
+  Paint tone_ = Paint::NORMAL, border_tone_ = Paint::NORMAL;
   lv_obj_t *icon_{}, *name_{}, *outer_{};
 };
 

@@ -11,7 +11,7 @@ tiles:
     entity: script.temperature_down
   - tile: switch
     name: Luce
-    options: { icon: lightbulb, border: busy, border_position: inside }
+    options: { icon: lightbulb, border: busy }
     sizes: [1x1, 2x2]
     entity: light.salotto
 states:

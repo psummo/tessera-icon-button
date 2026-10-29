@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+- Two more colours: purple and cyan.
+- Border position removed again: only the border's colour and width remain.
+
 ## 0.4.0
 - New tile: a switch button for lights, switches, input_booleans and fans. It toggles the entity and follows its state.
 - Border position: outside, medium or inside (rounded).

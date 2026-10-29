@@ -27,14 +27,11 @@
     "border_thin": "Sottile",
     "border_normal": "Medio",
     "border_thick": "Spesso",
-    "border_position": "Posizione del bordo",
-    "border_position_hint": "Esterno: verso il bordo della card. Interno: rientrato e arrotondato.",
-    "pos_outside": "Esterno",
-    "pos_medium": "Medio",
-    "pos_inside": "Interno (rotondo)",
     "tile_name_switch": "Tasto interruttore",
     "tile_example_switch": "Un tasto per una luce",
     "color_on": "Colore da acceso",
-    "color_on_hint": "Il colore dell'icona (e del bordo) mentre la luce o l'interruttore è acceso."
+    "color_on_hint": "Il colore dell'icona (e del bordo) mentre la luce o l'interruttore è acceso.",
+    "color_purple": "Viola",
+    "color_cyan": "Azzurro"
   }
 }
