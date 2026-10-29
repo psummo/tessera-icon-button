@@ -1,5 +1,7 @@
 # Icon button
 
+Two tiles: **Icon button** runs a script; **Switch button** toggles a light, switch, input_boolean or fan and shows whether it is on.
+
 A tile that is only an icon. Tap it and it runs a script of Home Assistant: a plus and a minus for
 a thermostat, a play button, a lock.
 

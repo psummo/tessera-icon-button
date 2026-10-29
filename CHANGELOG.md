@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+- New tile: a switch button for lights, switches, input_booleans and fans. It toggles the entity and follows its state.
+- Border position: outside, medium or inside (rounded).
+
 ## 0.3.0
 - New options: a coloured border and its width.
 

@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Icon button",
-    "summary": "A tile with only an icon: tap it to run a script of Home Assistant.",
+    "summary": "Icon-only tiles: one runs a script, the other toggles a light, switch, input_boolean or fan and shows whether it is on.",
     "tile_name": "Icon button",
     "tile_example": "A plus or minus button",
     "icon": "Icon",
@@ -56,6 +56,15 @@
     "border_width_hint": "Only when a border colour is chosen.",
     "border_thin": "Thin",
     "border_normal": "Medium",
-    "border_thick": "Thick"
+    "border_thick": "Thick",
+    "border_position": "Border position",
+    "border_position_hint": "Outside: towards the edge of the card. Inside: set in and rounded.",
+    "pos_outside": "Outside",
+    "pos_medium": "Medium",
+    "pos_inside": "Inside (rounded)",
+    "tile_name_switch": "Switch button",
+    "tile_example_switch": "A button for a light",
+    "color_on": "Colour when on",
+    "color_on_hint": "The colour of the icon (and the border) while the light or switch is on."
   }
 }

@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Tasto con icona",
-    "summary": "Un riquadro con solo un'icona: toccalo per eseguire uno script di Home Assistant.",
+    "summary": "Riquadri con solo icona: uno esegue uno script, l'altro accende/spegne una luce, un interruttore, un input_boolean o un ventilatore e mostra se è acceso.",
     "tile_name": "Tasto con icona",
     "tile_example": "Un tasto più o meno",
     "icon": "Icona",
@@ -26,6 +26,15 @@
     "border_width_hint": "Solo se hai scelto un colore del bordo.",
     "border_thin": "Sottile",
     "border_normal": "Medio",
-    "border_thick": "Spesso"
+    "border_thick": "Spesso",
+    "border_position": "Posizione del bordo",
+    "border_position_hint": "Esterno: verso il bordo della card. Interno: rientrato e arrotondato.",
+    "pos_outside": "Esterno",
+    "pos_medium": "Medio",
+    "pos_inside": "Interno (rotondo)",
+    "tile_name_switch": "Tasto interruttore",
+    "tile_example_switch": "Un tasto per una luce",
+    "color_on": "Colore da acceso",
+    "color_on_hint": "Il colore dell'icona (e del bordo) mentre la luce o l'interruttore è acceso."
   }
 }

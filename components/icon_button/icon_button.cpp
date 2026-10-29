@@ -60,33 +60,44 @@ static tessera::Tone tone_for(const char *name) {
   return tessera::Tone::NORMAL;
 }
 
+// Both tiles: a script tile only sends a tap; a switch tile (follows == true) also follows the state of its entity.
 class ButtonTile : public tessera::Tile {
  public:
+  explicit ButtonTile(bool follows) : follows_(follows) {}
+
   void create(const tessera::TileContext &c) override {
     entity_ = c.entity ? c.entity : "";
     tone_ = tone_for(c.options["color"] | "normal");
+    border_tone_ = tone_for(c.options["border"] | "none");
+    has_border_ = strcmp(c.options["border"] | "none", "none") != 0;
     show_name_ = c.options["show_name"] | false;
     const std::string name = c.name ? c.name : "";
     const int width = c.width, height = c.height;
 
-    // A thin frame: a block in the border's colour with a card-coloured block inside it, both made before the icon so the
-    // icon is drawn on top.
-    const char *border = c.options["border"] | "none";
-    if (strcmp(border, "none") != 0) {
+    // The frame: a block in the border's colour with a card-coloured block set in by the border's width, both made
+    // before the icon so the icon is drawn on top. Outside reaches past the area towards the card's edge, inside is set
+    // in and rounded.
+    if (has_border_) {
       const char *w = c.options["border_width"] | "thin";
       const int t = ui::px(strcmp(w, "thick") == 0 ? 5 : strcmp(w, "normal") == 0 ? 3 : 2);
-      lv_obj_t *outer = ui::block(c.parent, theme::CARD);
-      ui::set_fill(outer, tone_for(border), theme::CARD);
-      lv_obj_set_size(outer, width, height);
-      lv_obj_set_pos(outer, 0, 0);
+      const char *where = c.options["border_position"] | "medium";
+      const bool inside = strcmp(where, "inside") == 0;
+      const int off = strcmp(where, "outside") == 0 ? -ui::px(4) : inside ? ui::px(6) : 0;
+      const int radius = ui::px(18);
+      outer_ = ui::block(c.parent, theme::CARD);
+      lv_obj_set_size(outer_, width - 2 * off, height - 2 * off);
+      lv_obj_set_pos(outer_, off, off);
       lv_obj_t *inner = ui::block(c.parent, theme::CARD);
-      lv_obj_set_size(inner, width - 2 * t, height - 2 * t);
-      lv_obj_set_pos(inner, t, t);
+      lv_obj_set_size(inner, width - 2 * (off + t), height - 2 * (off + t));
+      lv_obj_set_pos(inner, off + t, off + t);
+      if (inside) {
+        lv_obj_set_style_radius(outer_, radius, 0);
+        lv_obj_set_style_radius(inner, radius - t > 0 ? radius - t : 0, 0);
+      }
     }
 
-    icon_ = ui::label(c.parent, Font::ICON, entity_.empty() ? theme::MUTED : theme::INK);
-    ui::set_tone(icon_, entity_.empty() ? tessera::Tone::NORMAL : tone_, entity_.empty() ? theme::MUTED : theme::INK);
-    ui::set_text(icon_, ui::icon(icon_code(c.options["icon"] | "plus")));
+    icon_ = ui::label(c.parent, Font::ICON, theme::INK);
+    ui::set_text(icon_, ui::icon(icon_code(c.options["icon"] | (follows_ ? "lightbulb" : "plus"))));
     lv_obj_set_width(icon_, width);
     lv_obj_set_style_text_align(icon_, LV_TEXT_ALIGN_CENTER, 0);
     const int ih = ui::line_height(Font::ICON);
@@ -102,24 +113,57 @@ class ButtonTile : public tessera::Tile {
     const int top = (height - ih - nh) / 2;
     lv_obj_set_pos(icon_, 0, top);
     if (name_) lv_obj_set_pos(name_, 0, top + ih);
+    apply();
+  }
+
+  void on_state(JsonObjectConst data) override {
+    if (!follows_) return;
+    const char *s = data["state"] | "";
+    on_ = strcmp(s, "on") == 0;
+    gone_ = strcmp(s, "unavailable") == 0 || strcmp(s, "unknown") == 0;
+    apply();
   }
 
   void on_tap() override {
-    if (!entity_.empty()) tessera::action("script.turn_on", entity_);
+    if (entity_.empty()) return;
+    if (!follows_) {
+      tessera::action("script.turn_on", entity_);
+    } else if (entity_.rfind("light.", 0) == 0) {
+      tessera::action("light.toggle", entity_);
+    } else if (entity_.rfind("input_boolean.", 0) == 0) {
+      tessera::action("input_boolean.toggle", entity_);
+    } else if (entity_.rfind("fan.", 0) == 0) {
+      tessera::action("fan.toggle", entity_);
+    } else {
+      tessera::action("switch.toggle", entity_);
+    }
   }
 
-  void on_theme() override {
-    ui::set_tone(icon_, entity_.empty() ? tessera::Tone::NORMAL : tone_, entity_.empty() ? theme::MUTED : theme::INK);
+  void on_theme() override { apply(); }
+
+ private:
+  // Colours from the current state: a script tile always shows its colours, a switch tile only while it is on.
+  void apply() {
+    const bool lit = !follows_ || on_;
+    if (entity_.empty() || gone_) {
+      ui::set_tone(icon_, tessera::Tone::NORMAL, theme::MUTED);
+    } else {
+      ui::set_tone(icon_, lit ? tone_ : tessera::Tone::NORMAL, theme::INK);
+    }
+    if (outer_) ui::set_fill(outer_, lit ? border_tone_ : tessera::Tone::NORMAL, theme::TRACK);
     if (name_) ui::set_color(name_, theme::MUTED);
   }
 
- private:
   std::string entity_;
-  tessera::Tone tone_ = tessera::Tone::NORMAL;
-  bool show_name_ = false;
-  lv_obj_t *icon_{}, *name_{};
+  bool follows_;
+  bool show_name_ = false, has_border_ = false, on_ = false, gone_ = false;
+  tessera::Tone tone_ = tessera::Tone::NORMAL, border_tone_ = tessera::Tone::NORMAL;
+  lv_obj_t *icon_{}, *name_{}, *outer_{};
 };
 
-void IconButton::setup() { add_tile("button", [this]() { return new ButtonTile(); }); }
+void IconButton::setup() {
+  add_tile("button", [this]() { return new ButtonTile(false); });
+  add_tile("switch", [this]() { return new ButtonTile(true); });
+}
 
 }  // namespace esphome::icon_button

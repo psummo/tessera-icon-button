@@ -9,6 +9,12 @@ tiles:
     options: { icon: minus, show_name: true }
     sizes: [1x1]
     entity: script.temperature_down
+  - tile: switch
+    name: Luce
+    options: { icon: lightbulb, border: busy, border_position: inside }
+    sizes: [1x1, 2x2]
+    entity: light.salotto
 states:
+  light.salotto: { state: "on" }
   script.temperature_up: { state: "off" }
   script.temperature_down: { state: "off" }
