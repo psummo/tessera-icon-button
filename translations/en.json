@@ -92,7 +92,7 @@
     "size_large": "Large",
     "size_xlarge": "Extra large",
     "tile_name_slider": "Slider",
-    "tile_example_slider": "A dimmer or blind slider",
+    "tile_example_slider": "Best on 2 cells or more: a dimmer, blind or fan slider",
     "orientation": "Direction",
     "orientation_hint": "Auto follows the shape of the tile: a taller tile is vertical.",
     "orient_auto": "Auto",

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.1
+- The slider can be a single cell again, so it can be placed and resized on screens with two columns; it works best on 2 cells or more.
+
 ## 0.8.0
 - New tile: a slider for dimmable lights, covers and fans. Tap where the bar should reach.
 

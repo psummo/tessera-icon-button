@@ -1,5 +1,5 @@
 id: icon_button
-version: 0.8.0
+version: 0.8.1
 api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
@@ -85,7 +85,7 @@ tiles:
   - id: slider
     name: tile_name_slider
     icon: gauge
-    sizes: { min: 2x1, max: 4x4 }
+    sizes: { min: 1x1, max: 4x4 }
     memory: 600
     domains: [light, cover, fan]
     attributes: [brightness, current_position, percentage]

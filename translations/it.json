@@ -62,7 +62,7 @@
     "size_large": "Grande",
     "size_xlarge": "Molto grande",
     "tile_name_slider": "Slider",
-    "tile_example_slider": "Uno slider per luce dimmerabile o tapparella",
+    "tile_example_slider": "Meglio su 2 caselle o più: slider per luce, tapparella o ventilatore",
     "orientation": "Direzione",
     "orientation_hint": "Auto segue la forma del riquadro: un riquadro più alto è verticale.",
     "orient_auto": "Auto",
