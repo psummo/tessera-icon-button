@@ -432,6 +432,7 @@ class ButtonTile : public tessera::Tile {
     border_tone_ = paint_for(c.options["border"] | "none");
     has_border_ = strcmp(c.options["border"] | "none", "none") != 0;
     const std::string name = c.options["label"] | "";
+    use_picture_ = (c.options["use_picture"] | false) && ui::pictures();
     const int width = c.width, height = c.height;
 
     // The frame: a block in the border's colour with a card-coloured block set in by the border's width, both made
@@ -478,6 +479,15 @@ class ButtonTile : public tessera::Tile {
   }
 
   void on_state(JsonObjectConst data) override {
+    if (pic_) {
+      const char *url = data["attributes"]["entity_picture"] | "";
+      const bool has = url[0] != '\0';
+      ui::set_picture(pic_, url, tessera::Fit::CONTAIN);
+      if (has) lv_obj_remove_flag(pic_, LV_OBJ_FLAG_HIDDEN);
+      else lv_obj_add_flag(pic_, LV_OBJ_FLAG_HIDDEN);
+      if (has) lv_obj_add_flag(icon_, LV_OBJ_FLAG_HIDDEN);
+      else lv_obj_remove_flag(icon_, LV_OBJ_FLAG_HIDDEN);
+    }
     if (!follows_) return;
     const char *s = data["state"] | "";
     on_ = strcmp(s, "on") == 0;
@@ -517,9 +527,10 @@ class ButtonTile : public tessera::Tile {
 
   std::string entity_;
   bool follows_;
+  bool use_picture_ = false;
   bool has_border_ = false, on_ = false, gone_ = false;
   Paint tone_ = Paint::NORMAL, border_tone_ = Paint::NORMAL;
-  lv_obj_t *icon_{}, *name_{}, *outer_{};
+  lv_obj_t *icon_{}, *name_{}, *outer_{}, *pic_{};
 };
 
 // A slider for a dimmable light, a cover or a fan. The core takes the drags, so a tap sets the level: tap where the bar

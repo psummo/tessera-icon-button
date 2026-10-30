@@ -1,5 +1,5 @@
 id: icon_button
-version: 0.10.0
+version: 0.11.0
 api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
@@ -20,7 +20,9 @@ tiles:
     name: tile_name
     icon: gesture-tap-button
     sizes: { min: 1x1, max: 4x4 }
-    memory: 300
+    memory: 500
+    pictures: 1
+    attributes: [entity_picture]
     domains: [script]
     example: tile_example
     preview: { title: "{name}" }
@@ -36,13 +38,16 @@ tiles:
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
       - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
           choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }, { value: large, label: size_large }, { value: xlarge, label: size_xlarge }] }
+      - { id: use_picture, kind: toggle, label: use_picture, hint: use_picture_hint, default: false }
       - { id: label, kind: text, label: label_text, hint: label_text_hint, default: "" }
   # The same, for a light, a switch, an input_boolean or a fan: a tap toggles it and the tile follows its state.
   - id: switch
     name: tile_name_switch
     icon: lightbulb
     sizes: { min: 1x1, max: 4x4 }
-    memory: 300
+    memory: 500
+    pictures: 1
+    attributes: [entity_picture]
     domains: [light, switch, input_boolean, fan]
     example: tile_example_switch
     preview: { title: "{name}" }
@@ -58,13 +63,16 @@ tiles:
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
       - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
           choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }, { value: large, label: size_large }, { value: xlarge, label: size_xlarge }] }
+      - { id: use_picture, kind: toggle, label: use_picture, hint: use_picture_hint, default: false }
       - { id: label, kind: text, label: label_text, hint: label_text_hint, default: "" }
   # The same for lights only: the editor lists only light.* entities.
   - id: light
     name: tile_name_light
     icon: lightbulb
     sizes: { min: 1x1, max: 4x4 }
-    memory: 300
+    memory: 500
+    pictures: 1
+    attributes: [entity_picture]
     domains: [light]
     example: tile_example_light
     preview: { title: "{name}" }
@@ -80,6 +88,7 @@ tiles:
           choices: [{ value: thin, label: border_thin }, { value: normal, label: border_normal }, { value: thick, label: border_thick }] }
       - { id: icon_size, kind: choice, label: icon_size, hint: icon_size_hint, default: normal,
           choices: [{ value: normal, label: size_normal }, { value: small, label: size_small }, { value: large, label: size_large }, { value: xlarge, label: size_xlarge }] }
+      - { id: use_picture, kind: toggle, label: use_picture, hint: use_picture_hint, default: false }
       - { id: label, kind: text, label: label_text, hint: label_text_hint, default: "" }
   # A slider for a dimmable light, a cover (blind, shutter) or a fan: tap where the bar should reach.
   - id: slider

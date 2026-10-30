@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.0
+- Own picture: the buttons can show the entity's entity_picture (for example /local/my-icon.png) instead of the icon.
+
 ## 0.10.0
 - Blind slider: a Reversed option, showing how closed the blind is, filling from the top or the right.
 

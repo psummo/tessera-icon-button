@@ -107,6 +107,8 @@
     "tile_name_slider_fan": "Fan slider",
     "tile_example_slider_fan": "Best on 2 cells or more: a fan speed slider",
     "invert": "Reversed",
-    "invert_hint": "The bar shows how closed the blind is and fills from the top (or from the right), like a blind coming down."
+    "invert_hint": "The bar shows how closed the blind is and fills from the top (or from the right), like a blind coming down.",
+    "use_picture": "Own picture",
+    "use_picture_hint": "Shows the entity's picture instead of the icon when it has one. In Home Assistant give the entity entity_picture: /local/your-image.png (customize, or picture: on a template entity). Not shown on the smallest screens."
   }
 }

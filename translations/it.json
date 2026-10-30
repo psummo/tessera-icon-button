@@ -77,6 +77,8 @@
     "tile_name_slider_fan": "Slider ventilatore",
     "tile_example_slider_fan": "Meglio su 2 caselle o più: slider per velocità del ventilatore",
     "invert": "Invertito",
-    "invert_hint": "La barra mostra quanto è chiusa la tapparella e si riempie dall'alto (o da destra), come una tapparella che scende."
+    "invert_hint": "La barra mostra quanto è chiusa la tapparella e si riempie dall'alto (o da destra), come una tapparella che scende.",
+    "use_picture": "Immagine propria",
+    "use_picture_hint": "Mostra l'immagine dell'entità al posto dell'icona, se ce l'ha. In Home Assistant dai all'entità entity_picture: /local/tua-immagine.png (customize, oppure picture: in un'entità template). Non compare sugli schermi più piccoli."
   }
 }
