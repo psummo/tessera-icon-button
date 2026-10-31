@@ -1,5 +1,5 @@
 id: icon_button
-version: 0.11.0
+version: 0.12.0
 api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
@@ -12,7 +12,7 @@ boards: any
 flash_kb: 12
 
 permissions:
-  home_assistant_actions: [script.turn_on, light.toggle, switch.toggle, input_boolean.toggle, fan.toggle, light.turn_on, light.turn_off, cover.set_cover_position, fan.set_percentage, fan.turn_off]
+  home_assistant_actions: [script.turn_on, light.toggle, switch.toggle, input_boolean.toggle, fan.toggle, light.turn_on, light.turn_off, cover.set_cover_position, fan.set_percentage, fan.turn_off, climate.set_temperature]
 
 tiles:
   # A tile that is only an icon: tapping it runs a script of Home Assistant.
@@ -159,3 +159,19 @@ tiles:
       - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,
           choices: [{ value: auto, label: orient_auto }, { value: horizontal, label: orient_horizontal }, { value: vertical, label: orient_vertical }] }
       - { id: show_value, kind: toggle, label: show_value, hint: show_value_hint, default: false }
+  # A thermostat for a climate entity (a heating, an air conditioner): big - and + at the two ends, the temperature and
+  # the setpoint in the middle (the higher one larger), and a flame while it heats.
+  - id: climate
+    name: tile_name_climate
+    icon: thermostat
+    sizes: { min: 1x1, max: 4x4 }
+    memory: 900
+    domains: [climate]
+    attributes: [current_temperature, temperature, hvac_action, target_temp_step, min_temp, max_temp]
+    example: tile_example_climate
+    preview: { title: "{name}" }
+    options:
+      - { id: step, kind: number, min: 0, max: 5, step: 0.5, default: 0, label: step, hint: step_hint }
+      - { id: decimal_comma, kind: toggle, label: decimal_comma, hint: decimal_comma_hint, default: false }
+      - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,
+          choices: [{ value: auto, label: orient_auto }, { value: horizontal, label: orient_horizontal }, { value: vertical, label: orient_vertical }] }

@@ -18,7 +18,12 @@ tiles:
     name: Tapparella
     sizes: [2x1, 2x2]
     entity: cover.studio
+  - tile: climate
+    name: Heating
+    sizes: [2x1, 2x2]
+    entity: climate.heating
 states:
+  climate.heating: { state: heat, attributes: { current_temperature: 19.5, temperature: 21, hvac_action: heating, target_temp_step: 0.5 } }
   cover.studio: { state: open, attributes: { current_position: 60 } }
   light.salotto: { state: "on" }
   script.temperature_up: { state: "off" }

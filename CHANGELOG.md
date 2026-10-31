@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.0
+- New tile: a thermostat for climate entities, with big - and + keys, the temperature and the setpoint (the higher one larger) and a flame while heating.
+
 ## 0.11.0
 - Own picture: the buttons can show the entity's entity_picture (for example /local/my-icon.png) instead of the icon.
 

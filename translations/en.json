@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Icon button",
-    "summary": "Icon-only buttons for scripts, lights, switches and fans, and a tap slider for dimmers, blinds and fans.",
+    "summary": "Icon-only buttons, sliders for dimmers, blinds and fans, and a big-key thermostat tile.",
     "tile_name": "Icon button",
     "tile_example": "A plus or minus button",
     "icon": "Icon",
@@ -109,6 +109,12 @@
     "invert": "Reversed",
     "invert_hint": "The bar shows how closed the blind is and fills from the top (or from the right), like a blind coming down.",
     "use_picture": "Own picture",
-    "use_picture_hint": "Shows the entity's picture instead of the icon when it has one. In Home Assistant give the entity entity_picture: /local/your-image.png (customize, or picture: on a template entity). Not shown on the smallest screens."
+    "use_picture_hint": "Shows the entity's picture instead of the icon when it has one. In Home Assistant give the entity entity_picture: /local/your-image.png (customize, or picture: on a template entity). Not shown on the smallest screens.",
+    "tile_name_climate": "Thermostat",
+    "tile_example_climate": "Big - and + keys, the temperature, the setpoint and a flame",
+    "step": "Step",
+    "step_hint": "Degrees per tap. 0 uses the step of the thermostat itself.",
+    "decimal_comma": "Decimal comma",
+    "decimal_comma_hint": "Writes 21,5 instead of 21.5."
   }
 }

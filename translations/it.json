@@ -5,7 +5,7 @@
   "screen": {},
   "app": {
     "name": "Tasto con icona",
-    "summary": "Tasti con solo icona per script, luci, interruttori e ventilatori, e uno slider a tocco per luci dimmerabili, tapparelle e ventilatori.",
+    "summary": "Tasti con solo icona, slider per luci, tapparelle e ventilatori, e un riquadro termostato con tasti grandi.",
     "tile_name": "Tasto con icona",
     "tile_example": "Un tasto più o meno",
     "icon": "Icona",
@@ -79,6 +79,12 @@
     "invert": "Invertito",
     "invert_hint": "La barra mostra quanto è chiusa la tapparella e si riempie dall'alto (o da destra), come una tapparella che scende.",
     "use_picture": "Immagine propria",
-    "use_picture_hint": "Mostra l'immagine dell'entità al posto dell'icona, se ce l'ha. In Home Assistant dai all'entità entity_picture: /local/tua-immagine.png (customize, oppure picture: in un'entità template). Non compare sugli schermi più piccoli."
+    "use_picture_hint": "Mostra l'immagine dell'entità al posto dell'icona, se ce l'ha. In Home Assistant dai all'entità entity_picture: /local/tua-immagine.png (customize, oppure picture: in un'entità template). Non compare sugli schermi più piccoli.",
+    "tile_name_climate": "Termostato",
+    "tile_example_climate": "Tasti - e + grandi, temperatura, setpoint e fiammella",
+    "step": "Passo",
+    "step_hint": "Gradi per ogni tocco. 0 usa il passo del termostato stesso.",
+    "decimal_comma": "Virgola decimale",
+    "decimal_comma_hint": "Scrive 21,5 invece di 21.5."
   }
 }

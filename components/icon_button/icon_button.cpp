@@ -1,5 +1,7 @@
 #include "icon_button.h"
 #include <algorithm>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
 #include <string>
 
@@ -672,6 +674,172 @@ class SliderTile : public tessera::Tile {
   lv_obj_t *track_{}, *fill_{}, *icon_{}, *number_{};
 };
 
+// A thermostat for a climate entity. Big - and + keys at the two ends (left and right, or bottom and top on a tall tile),
+// the temperature and the setpoint in the middle with the higher one larger, and a flame while the entity heats. A tap on
+// either half of the tile steps the setpoint, so a key is as big as half the tile.
+class ClimateTile : public tessera::Tile {
+ public:
+  void create(const tessera::TileContext &c) override {
+    entity_ = c.entity ? c.entity : "";
+    parent_ = c.parent;
+    w_ = c.width;
+    h_ = c.height;
+    comma_ = c.options["decimal_comma"] | false;
+    step_opt_ = c.options["step"] | 0.0f;
+    const char *dir = c.options["orientation"] | "auto";
+    vertical_ = strcmp(dir, "vertical") == 0 || (strcmp(dir, "auto") == 0 && h_ * 10 > w_ * 13);
+
+    const int pad = ui::px(8), gap = ui::px(8);
+    const int ih = ui::line_height(Font::ICON);
+    int kw, kh;
+    if (vertical_) {
+      kw = w_ - 2 * pad;
+      kh = std::max(ui::px(44), std::min(h_ / 4, kw));
+      plus_x_ = pad; plus_y_ = pad;
+      minus_x_ = pad; minus_y_ = h_ - pad - kh;
+      cx0_ = pad; cw_ = w_ - 2 * pad;
+      cy0_ = pad + kh + gap; ch_ = h_ - 2 * (pad + kh + gap);
+    } else {
+      kh = h_ - 2 * pad;
+      kw = std::max(ui::px(44), std::min(kh, w_ / 3));
+      minus_x_ = pad; minus_y_ = pad;
+      plus_x_ = w_ - pad - kw; plus_y_ = pad;
+      cx0_ = pad + kw + gap; cw_ = w_ - 2 * (pad + kw + gap);
+      cy0_ = pad; ch_ = h_ - 2 * pad;
+    }
+    ch_ = std::max(ch_, 1);
+    cw_ = std::max(cw_, 1);
+    key(minus_, minus_icon_, minus_x_, minus_y_, kw, kh, ih, 0xF0374);
+    key(plus_, plus_icon_, plus_x_, plus_y_, kw, kh, ih, 0xF0415);
+
+    cur_icon_ = ui::label(c.parent, Font::ICON_SMALL, theme::MUTED);
+    ui::set_text(cur_icon_, ui::icon(0xF050F));
+    set_icon_ = ui::label(c.parent, Font::ICON_SMALL, theme::MUTED);
+    ui::set_text(set_icon_, ui::icon(0xF0393));
+    cur_text_ = ui::label(c.parent, Font::HEADLINE, theme::INK);
+    set_text_ = ui::label(c.parent, Font::BODY_LARGE, theme::MUTED);
+    flame_ = ui::label(c.parent, Font::ICON, theme::INK);
+    ui::set_text(flame_, ui::icon(0xF0238));
+    lv_obj_set_pos(flame_, cx0_ + cw_ - ih, cy0_);
+    lv_obj_add_flag(flame_, LV_OBJ_FLAG_HIDDEN);
+    apply();
+  }
+
+  void on_state(JsonObjectConst data) override {
+    const char *s = data["state"] | "";
+    gone_ = strcmp(s, "unavailable") == 0 || strcmp(s, "unknown") == 0;
+    off_ = strcmp(s, "off") == 0;
+    JsonObjectConst a = data["attributes"];
+    cur_ = number(a["current_temperature"]);
+    set_ = number(a["temperature"]);
+    const float st = number(a["target_temp_step"]);
+    step_ = std::isnan(st) || st <= 0 ? 0.5f : st;
+    const float lo = number(a["min_temp"]), hi = number(a["max_temp"]);
+    min_ = std::isnan(lo) ? 7.0f : lo;
+    max_ = std::isnan(hi) ? 35.0f : hi;
+    heating_ = strcmp(a["hvac_action"] | "", "heating") == 0;
+    apply();
+  }
+
+  void on_tap() override {
+    if (entity_.empty() || gone_) return;
+    const tessera::Point p = tessera::tap_point();
+    if (p.x < 0 || p.y < 0) return;
+    const bool plus = vertical_ ? p.y < h_ / 2 : p.x >= w_ / 2;
+    const float step = step_opt_ > 0 ? step_opt_ : step_;
+    float base = !std::isnan(set_) ? set_ : !std::isnan(cur_) ? cur_ : 20.0f;
+    float next = base + (plus ? step : -step);
+    next = std::round(next / step) * step;
+    next = std::max(min_, std::min(max_, next));
+    char text[16];
+    snprintf(text, sizeof text, "%.1f", next);
+    if (tessera::action("climate.set_temperature", entity_, "temperature", text)) set_ = next;
+    apply();
+  }
+
+  void on_theme() override { apply(); }
+
+ private:
+  static float number(JsonVariantConst v) { return v.isNull() ? static_cast<float>(NAN) : v.as<float>(); }
+
+  // A key: a rounded block with its icon in the middle.
+  void key(lv_obj_t *&block, lv_obj_t *&icon, int x, int y, int w, int h, int ih, uint32_t code) {
+    block = ui::block(parentless(), theme::TRACK);
+    lv_obj_set_size(block, w, h);
+    lv_obj_set_pos(block, x, y);
+    icon = ui::label(parentless(), Font::ICON, theme::INK);
+    ui::set_text(icon, ui::icon(code));
+    lv_obj_set_width(icon, w);
+    lv_obj_set_style_text_align(icon, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_pos(icon, x, y + (h - ih) / 2);
+  }
+  lv_obj_t *parentless() { return parent_; }
+
+  std::string format(float v) const {
+    if (std::isnan(v)) return "-";
+    char text[16];
+    if (std::fabs(v - std::round(v)) < 0.05f) snprintf(text, sizeof text, "%.0f", v);
+    else snprintf(text, sizeof text, "%.1f", v);
+    std::string out = text;
+    if (comma_)
+      for (char &ch : out)
+        if (ch == '.') ch = ',';
+    return out + "\xC2\xB0";  // the degree sign
+  }
+
+  // The middle: the temperature row and the setpoint row, the higher of the two in the larger type. They keep their order,
+  // only the sizes swap.
+  void apply() {
+    const bool cur_big = !std::isnan(cur_) && (std::isnan(set_) || cur_ >= set_);
+    const std::string cur = gone_ ? "-" : format(cur_), set = gone_ ? "-" : format(set_);
+    const std::string &big_text = cur_big ? cur : set;
+    Font big = Font::VALUE;
+    const int iw = ui::line_height(Font::ICON_SMALL) * 3 / 2, gap = ui::px(6);
+    for (Font f : {Font::VALUE, Font::HEADLINE, Font::TITLE}) {
+      big = f;
+      if (iw + gap + ui::text_width(big_text, f) <= cw_) break;
+    }
+    const Font small = Font::BODY_LARGE;
+    const Font cf = cur_big ? big : small, sf = cur_big ? small : big;
+    ui::set_font(cur_text_, cf);
+    ui::set_font(set_text_, sf);
+    ui::set_text(cur_text_, cur);
+    ui::set_text(set_text_, set);
+    const int hc = ui::line_height(cf), hs = ui::line_height(sf);
+    const int top = cy0_ + (ch_ - hc - hs) / 2;
+    row(cur_icon_, cur_text_, cur, cf, top, hc, iw, gap);
+    row(set_icon_, set_text_, set, sf, top + hc, hs, iw, gap);
+
+    const theme::Role main = (off_ || gone_) ? theme::MUTED : theme::INK;
+    ui::set_color(cur_text_, cur_big ? main : theme::MUTED);
+    ui::set_color(set_text_, cur_big ? theme::MUTED : main);
+    ui::set_color(minus_icon_, gone_ ? theme::MUTED : theme::INK);
+    ui::set_color(plus_icon_, gone_ ? theme::MUTED : theme::INK);
+    ui::set_tone(flame_, tessera::Tone::BUSY, theme::INK);
+    if (heating_ && !gone_) lv_obj_remove_flag(flame_, LV_OBJ_FLAG_HIDDEN);
+    else lv_obj_add_flag(flame_, LV_OBJ_FLAG_HIDDEN);
+  }
+
+  void row(lv_obj_t *icon, lv_obj_t *text, const std::string &value, Font f, int y, int h, int iw, int gap) {
+    const int tw = ui::text_width(value, f) + ui::px(6);
+    const int x0 = cx0_ + (cw_ - (iw + gap + tw)) / 2;
+    lv_obj_set_width(icon, iw);
+    lv_obj_set_style_text_align(icon, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_pos(icon, x0, y + (h - ui::line_height(Font::ICON_SMALL)) / 2);
+    lv_obj_set_width(text, tw);
+    lv_obj_set_pos(text, x0 + iw + gap, y);
+  }
+
+  std::string entity_;
+  bool comma_ = false, vertical_ = false, gone_ = false, off_ = false, heating_ = false;
+  float step_opt_ = 0, step_ = 0.5f, min_ = 7.0f, max_ = 35.0f;
+  float cur_ = static_cast<float>(NAN), set_ = static_cast<float>(NAN);
+  int w_ = 0, h_ = 0, cx0_ = 0, cy0_ = 0, cw_ = 1, ch_ = 1;
+  int plus_x_ = 0, plus_y_ = 0, minus_x_ = 0, minus_y_ = 0;
+  lv_obj_t *parent_{}, *minus_{}, *plus_{}, *minus_icon_{}, *plus_icon_{};
+  lv_obj_t *cur_icon_{}, *set_icon_{}, *cur_text_{}, *set_text_{}, *flame_{};
+};
+
 void IconButton::setup() {
   add_tile("button", [this]() { return new ButtonTile(false); });
   add_tile("switch", [this]() { return new ButtonTile(true); });
@@ -680,6 +848,7 @@ void IconButton::setup() {
   add_tile("slider_light", [this]() { return new SliderTile(); });
   add_tile("slider_cover", [this]() { return new SliderTile(); });
   add_tile("slider_fan", [this]() { return new SliderTile(); });
+  add_tile("climate", [this]() { return new ClimateTile(); });
 }
 
 }  // namespace esphome::icon_button
