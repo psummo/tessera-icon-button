@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.1
+- Thermostat: only the keys act on a tap, not the whole tile; keys are smaller and coloured (minus blue, plus amber by default, both changeable); the setpoint no longer jumps back while Home Assistant catches up after a tap.
+
 ## 0.12.0
 - New tile: a thermostat for climate entities, with big - and + keys, the temperature and the setpoint (the higher one larger) and a flame while heating.
 

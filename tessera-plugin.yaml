@@ -1,5 +1,5 @@
 id: icon_button
-version: 0.12.0
+version: 0.12.1
 api: "0.9"
 icon: gesture-tap-button
 maintainer: psummo
@@ -171,6 +171,10 @@ tiles:
     example: tile_example_climate
     preview: { title: "{name}" }
     options:
+      - { id: minus_color, kind: choice, label: minus_color, hint: key_color_hint, default: accent,
+          choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
+      - { id: plus_color, kind: choice, label: plus_color, hint: key_color_hint, default: busy,
+          choices: [{ value: normal, label: color_normal }, { value: accent, label: color_accent }, { value: busy, label: color_busy }, { value: alert, label: color_alert }, { value: good, label: color_good }, { value: purple, label: color_purple }, { value: cyan, label: color_cyan }] }
       - { id: step, kind: number, min: 0, max: 5, step: 0.5, default: 0, label: step, hint: step_hint }
       - { id: decimal_comma, kind: toggle, label: decimal_comma, hint: decimal_comma_hint, default: false }
       - { id: orientation, kind: choice, label: orientation, hint: orientation_hint, default: auto,

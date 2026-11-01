@@ -694,14 +694,14 @@ class ClimateTile : public tessera::Tile {
     int kw, kh;
     if (vertical_) {
       kw = w_ - 2 * pad;
-      kh = std::max(ui::px(44), std::min(h_ / 4, kw));
+      kh = std::max(ui::px(40), std::min(h_ / 5, kw * 7 / 10));
       plus_x_ = pad; plus_y_ = pad;
       minus_x_ = pad; minus_y_ = h_ - pad - kh;
       cx0_ = pad; cw_ = w_ - 2 * pad;
       cy0_ = pad + kh + gap; ch_ = h_ - 2 * (pad + kh + gap);
     } else {
       kh = h_ - 2 * pad;
-      kw = std::max(ui::px(44), std::min(kh, w_ / 3));
+      kw = std::max(ui::px(40), std::min(kh * 7 / 10, w_ / 4));
       minus_x_ = pad; minus_y_ = pad;
       plus_x_ = w_ - pad - kw; plus_y_ = pad;
       cx0_ = pad + kw + gap; cw_ = w_ - 2 * (pad + kw + gap);
@@ -709,6 +709,10 @@ class ClimateTile : public tessera::Tile {
     }
     ch_ = std::max(ch_, 1);
     cw_ = std::max(cw_, 1);
+    kw_ = kw;
+    kh_ = kh;
+    minus_paint_ = paint_for(c.options["minus_color"] | "accent");
+    plus_paint_ = paint_for(c.options["plus_color"] | "busy");
     key(minus_, minus_icon_, minus_x_, minus_y_, kw, kh, ih, 0xF0374);
     key(plus_, plus_icon_, plus_x_, plus_y_, kw, kh, ih, 0xF0415);
 
@@ -731,7 +735,8 @@ class ClimateTile : public tessera::Tile {
     off_ = strcmp(s, "off") == 0;
     JsonObjectConst a = data["attributes"];
     cur_ = number(a["current_temperature"]);
-    set_ = number(a["temperature"]);
+    const float incoming = number(a["temperature"]);
+    if (hold_ <= 0 || std::isnan(set_)) set_ = incoming;
     const float st = number(a["target_temp_step"]);
     step_ = std::isnan(st) || st <= 0 ? 0.5f : st;
     const float lo = number(a["min_temp"]), hi = number(a["max_temp"]);
@@ -745,7 +750,11 @@ class ClimateTile : public tessera::Tile {
     if (entity_.empty() || gone_) return;
     const tessera::Point p = tessera::tap_point();
     if (p.x < 0 || p.y < 0) return;
-    const bool plus = vertical_ ? p.y < h_ / 2 : p.x >= w_ / 2;
+    const int m = ui::px(6);
+    const bool on_plus = p.x >= plus_x_ - m && p.x < plus_x_ + kw_ + m && p.y >= plus_y_ - m && p.y < plus_y_ + kh_ + m;
+    const bool on_minus = p.x >= minus_x_ - m && p.x < minus_x_ + kw_ + m && p.y >= minus_y_ - m && p.y < minus_y_ + kh_ + m;
+    if (!on_plus && !on_minus) return;  // only the keys act, not the rest of the tile
+    const bool plus = on_plus;
     const float step = step_opt_ > 0 ? step_opt_ : step_;
     float base = !std::isnan(set_) ? set_ : !std::isnan(cur_) ? cur_ : 20.0f;
     float next = base + (plus ? step : -step);
@@ -753,8 +762,15 @@ class ClimateTile : public tessera::Tile {
     next = std::max(min_, std::min(max_, next));
     char text[16];
     snprintf(text, sizeof text, "%.1f", next);
-    if (tessera::action("climate.set_temperature", entity_, "temperature", text)) set_ = next;
+    if (tessera::action("climate.set_temperature", entity_, "temperature", text)) {
+      set_ = next;
+      hold_ = 3;  // keep what the finger set while Home Assistant catches up
+    }
     apply();
+  }
+
+  void on_tick(uint32_t) override {
+    if (hold_ > 0) --hold_;
   }
 
   void on_theme() override { apply(); }
@@ -813,8 +829,10 @@ class ClimateTile : public tessera::Tile {
     const theme::Role main = (off_ || gone_) ? theme::MUTED : theme::INK;
     ui::set_color(cur_text_, cur_big ? main : theme::MUTED);
     ui::set_color(set_text_, cur_big ? theme::MUTED : main);
-    ui::set_color(minus_icon_, gone_ ? theme::MUTED : theme::INK);
-    ui::set_color(plus_icon_, gone_ ? theme::MUTED : theme::INK);
+    paint_block(minus_, minus_paint_, theme::TRACK);
+    paint_block(plus_, plus_paint_, theme::TRACK);
+    ui::set_color(minus_icon_, minus_paint_ == Paint::NORMAL ? theme::INK : theme::ON_ACCENT);
+    ui::set_color(plus_icon_, plus_paint_ == Paint::NORMAL ? theme::INK : theme::ON_ACCENT);
     ui::set_tone(flame_, tessera::Tone::BUSY, theme::INK);
     if (heating_ && !gone_) lv_obj_remove_flag(flame_, LV_OBJ_FLAG_HIDDEN);
     else lv_obj_add_flag(flame_, LV_OBJ_FLAG_HIDDEN);
@@ -834,7 +852,8 @@ class ClimateTile : public tessera::Tile {
   bool comma_ = false, vertical_ = false, gone_ = false, off_ = false, heating_ = false;
   float step_opt_ = 0, step_ = 0.5f, min_ = 7.0f, max_ = 35.0f;
   float cur_ = static_cast<float>(NAN), set_ = static_cast<float>(NAN);
-  int w_ = 0, h_ = 0, cx0_ = 0, cy0_ = 0, cw_ = 1, ch_ = 1;
+  int w_ = 0, h_ = 0, cx0_ = 0, cy0_ = 0, cw_ = 1, ch_ = 1, kw_ = 1, kh_ = 1, hold_ = 0;
+  Paint minus_paint_ = Paint::ACCENT, plus_paint_ = Paint::BUSY;
   int plus_x_ = 0, plus_y_ = 0, minus_x_ = 0, minus_y_ = 0;
   lv_obj_t *parent_{}, *minus_{}, *plus_{}, *minus_icon_{}, *plus_icon_{};
   lv_obj_t *cur_icon_{}, *set_icon_{}, *cur_text_{}, *set_text_{}, *flame_{};

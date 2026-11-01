@@ -85,6 +85,9 @@
     "step": "Passo",
     "step_hint": "Gradi per ogni tocco. 0 usa il passo del termostato stesso.",
     "decimal_comma": "Virgola decimale",
-    "decimal_comma_hint": "Scrive 21,5 invece di 21.5."
+    "decimal_comma_hint": "Scrive 21,5 invece di 21.5.",
+    "minus_color": "Colore del tasto meno",
+    "plus_color": "Colore del tasto più",
+    "key_color_hint": "Il colore del tasto. Normale è grigio."
   }
 }
