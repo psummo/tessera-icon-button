@@ -694,14 +694,14 @@ class ClimateTile : public tessera::Tile {
     int kw, kh;
     if (vertical_) {
       kw = w_ - 2 * pad;
-      kh = std::max(ui::px(40), std::min(h_ / 5, kw * 7 / 10));
+      kh = std::max(ui::px(36), std::min(h_ / 6, kw * 6 / 10));
       plus_x_ = pad; plus_y_ = pad;
       minus_x_ = pad; minus_y_ = h_ - pad - kh;
       cx0_ = pad; cw_ = w_ - 2 * pad;
       cy0_ = pad + kh + gap; ch_ = h_ - 2 * (pad + kh + gap);
     } else {
       kh = h_ - 2 * pad;
-      kw = std::max(ui::px(40), std::min(kh * 7 / 10, w_ / 4));
+      kw = std::max(ui::px(36), std::min(kh * 6 / 10, w_ / 5));
       minus_x_ = pad; minus_y_ = pad;
       plus_x_ = w_ - pad - kw; plus_y_ = pad;
       cx0_ = pad + kw + gap; cw_ = w_ - 2 * (pad + kw + gap);
@@ -711,10 +711,11 @@ class ClimateTile : public tessera::Tile {
     cw_ = std::max(cw_, 1);
     kw_ = kw;
     kh_ = kh;
+    outline_ = strcmp(c.options["key_style"] | "outline", "filled") != 0;
     minus_paint_ = paint_for(c.options["minus_color"] | "accent");
     plus_paint_ = paint_for(c.options["plus_color"] | "busy");
-    key(minus_, minus_icon_, minus_x_, minus_y_, kw, kh, ih, 0xF0374);
-    key(plus_, plus_icon_, plus_x_, plus_y_, kw, kh, ih, 0xF0415);
+    key(minus_, minus_in_, minus_icon_, minus_x_, minus_y_, kw, kh, ih, 0xF0374);
+    key(plus_, plus_in_, plus_icon_, plus_x_, plus_y_, kw, kh, ih, 0xF0415);
 
     cur_icon_ = ui::label(c.parent, Font::ICON_SMALL, theme::MUTED);
     ui::set_text(cur_icon_, ui::icon(0xF050F));
@@ -778,12 +779,16 @@ class ClimateTile : public tessera::Tile {
  private:
   static float number(JsonVariantConst v) { return v.isNull() ? static_cast<float>(NAN) : v.as<float>(); }
 
-  // A key: a rounded block with its icon in the middle.
-  void key(lv_obj_t *&block, lv_obj_t *&icon, int x, int y, int w, int h, int ih, uint32_t code) {
-    block = ui::block(parentless(), theme::TRACK);
+  // A key: a rounded block, a card-coloured block inside it for the outline style, and the icon in the middle.
+  void key(lv_obj_t *&block, lv_obj_t *&inner, lv_obj_t *&icon, int x, int y, int w, int h, int ih, uint32_t code) {
+    const int t = ui::px(3);
+    block = ui::block(parent_, theme::TRACK);
     lv_obj_set_size(block, w, h);
     lv_obj_set_pos(block, x, y);
-    icon = ui::label(parentless(), Font::ICON, theme::INK);
+    inner = ui::block(parent_, theme::CARD);
+    lv_obj_set_size(inner, w - 2 * t, h - 2 * t);
+    lv_obj_set_pos(inner, x + t, y + t);
+    icon = ui::label(parent_, Font::ICON, theme::INK);
     ui::set_text(icon, ui::icon(code));
     lv_obj_set_width(icon, w);
     lv_obj_set_style_text_align(icon, LV_TEXT_ALIGN_CENTER, 0);
@@ -803,36 +808,54 @@ class ClimateTile : public tessera::Tile {
     return out + "\xC2\xB0";  // the degree sign
   }
 
-  // The middle: the temperature row and the setpoint row, the higher of the two in the larger type. They keep their order,
-  // only the sizes swap.
+  // A key in its colour: the whole key filled, or only its border (the inside is the card's colour, the icon the colour).
+  void style_key(lv_obj_t *block, lv_obj_t *inner, lv_obj_t *icon, Paint paint) {
+    paint_block(block, paint, theme::TRACK);
+    if (outline_ && paint != Paint::NORMAL) {
+      lv_obj_remove_flag(inner, LV_OBJ_FLAG_HIDDEN);
+      paint_label(icon, paint, theme::INK);
+    } else {
+      lv_obj_add_flag(inner, LV_OBJ_FLAG_HIDDEN);
+      ui::set_color(icon, paint == Paint::NORMAL ? theme::INK : theme::ON_ACCENT);
+    }
+  }
+
+  // The middle: the temperature row and the setpoint row, the higher of the two in the larger type, with room between
+  // them. They keep their order, only the sizes swap. The largest pair of fonts that fits the width and the height.
   void apply() {
     const bool cur_big = !std::isnan(cur_) && (std::isnan(set_) || cur_ >= set_);
     const std::string cur = gone_ ? "-" : format(cur_), set = gone_ ? "-" : format(set_);
-    const std::string &big_text = cur_big ? cur : set;
-    Font big = Font::VALUE;
-    const int iw = ui::line_height(Font::ICON_SMALL) * 3 / 2, gap = ui::px(6);
-    for (Font f : {Font::VALUE, Font::HEADLINE, Font::TITLE}) {
-      big = f;
-      if (iw + gap + ui::text_width(big_text, f) <= cw_) break;
+    const std::string &big_text = cur_big ? cur : set, &small_text = cur_big ? set : cur;
+    const int iw = ui::line_height(Font::ICON_SMALL) * 3 / 2, gap = ui::px(6), between = ui::px(10);
+    static const Font LADDER[] = {Font::VALUE, Font::HEADLINE, Font::TITLE, Font::BODY_LARGE};
+    Font big = Font::TITLE, small = Font::BODY_LARGE;
+    bool found = false;
+    for (int i = 0; i < 3 && !found; ++i) {
+      for (int j = i + 1; j < 4 && !found; ++j) {
+        const bool wide = iw + gap + ui::text_width(big_text, LADDER[i]) <= cw_ && iw + gap + ui::text_width(small_text, LADDER[j]) <= cw_;
+        const bool tall = ui::line_height(LADDER[i]) + ui::line_height(LADDER[j]) + between <= ch_;
+        if (wide && tall) {
+          big = LADDER[i];
+          small = LADDER[j];
+          found = true;
+        }
+      }
     }
-    const Font small = Font::BODY_LARGE;
     const Font cf = cur_big ? big : small, sf = cur_big ? small : big;
     ui::set_font(cur_text_, cf);
     ui::set_font(set_text_, sf);
     ui::set_text(cur_text_, cur);
     ui::set_text(set_text_, set);
     const int hc = ui::line_height(cf), hs = ui::line_height(sf);
-    const int top = cy0_ + (ch_ - hc - hs) / 2;
+    const int top = cy0_ + (ch_ - hc - hs - between) / 2;
     row(cur_icon_, cur_text_, cur, cf, top, hc, iw, gap);
-    row(set_icon_, set_text_, set, sf, top + hc, hs, iw, gap);
+    row(set_icon_, set_text_, set, sf, top + hc + between, hs, iw, gap);
 
     const theme::Role main = (off_ || gone_) ? theme::MUTED : theme::INK;
     ui::set_color(cur_text_, cur_big ? main : theme::MUTED);
     ui::set_color(set_text_, cur_big ? theme::MUTED : main);
-    paint_block(minus_, minus_paint_, theme::TRACK);
-    paint_block(plus_, plus_paint_, theme::TRACK);
-    ui::set_color(minus_icon_, minus_paint_ == Paint::NORMAL ? theme::INK : theme::ON_ACCENT);
-    ui::set_color(plus_icon_, plus_paint_ == Paint::NORMAL ? theme::INK : theme::ON_ACCENT);
+    style_key(minus_, minus_in_, minus_icon_, minus_paint_);
+    style_key(plus_, plus_in_, plus_icon_, plus_paint_);
     ui::set_tone(flame_, tessera::Tone::BUSY, theme::INK);
     if (heating_ && !gone_) lv_obj_remove_flag(flame_, LV_OBJ_FLAG_HIDDEN);
     else lv_obj_add_flag(flame_, LV_OBJ_FLAG_HIDDEN);
@@ -854,8 +877,9 @@ class ClimateTile : public tessera::Tile {
   float cur_ = static_cast<float>(NAN), set_ = static_cast<float>(NAN);
   int w_ = 0, h_ = 0, cx0_ = 0, cy0_ = 0, cw_ = 1, ch_ = 1, kw_ = 1, kh_ = 1, hold_ = 0;
   Paint minus_paint_ = Paint::ACCENT, plus_paint_ = Paint::BUSY;
+  bool outline_ = true;
   int plus_x_ = 0, plus_y_ = 0, minus_x_ = 0, minus_y_ = 0;
-  lv_obj_t *parent_{}, *minus_{}, *plus_{}, *minus_icon_{}, *plus_icon_{};
+  lv_obj_t *parent_{}, *minus_{}, *plus_{}, *minus_in_{}, *plus_in_{}, *minus_icon_{}, *plus_icon_{};
   lv_obj_t *cur_icon_{}, *set_icon_{}, *cur_text_{}, *set_text_{}, *flame_{};
 };
 

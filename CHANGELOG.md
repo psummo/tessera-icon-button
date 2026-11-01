@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.13.0
+- Thermostat: a key style option (outline only or filled), smaller keys, more room between the two numbers and the largest type that fits.
+
 ## 0.12.1
 - Thermostat: only the keys act on a tap, not the whole tile; keys are smaller and coloured (minus blue, plus amber by default, both changeable); the setpoint no longer jumps back while Home Assistant catches up after a tap.
 

@@ -118,6 +118,10 @@
     "decimal_comma_hint": "Writes 21,5 instead of 21.5.",
     "minus_color": "Minus key colour",
     "plus_color": "Plus key colour",
-    "key_color_hint": "The colour of the key. Normal is grey."
+    "key_color_hint": "The colour of the key. Normal is grey.",
+    "key_style": "Key style",
+    "key_style_hint": "Outline colours only the border of the keys; filled colours the whole key.",
+    "style_outline": "Outline",
+    "style_filled": "Filled"
   }
 }
